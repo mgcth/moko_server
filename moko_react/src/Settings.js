@@ -12,12 +12,9 @@ const Section = styled.section`
 
 function Settings() {
     return (
-        <AppDiv className="App">
-            <AppHeader />
-            <Section>
-                Settings
-            </Section>
-        </AppDiv>
+        <Section>
+            Settings
+        </Section>
     );
 }
 

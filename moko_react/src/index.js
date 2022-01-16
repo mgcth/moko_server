@@ -5,20 +5,29 @@ import {
   Routes,
   Route
 } from "react-router-dom";
-import App from './App';
+import styled from 'styled-components'
+import Home from './Home';
 import Video from './Video';
 import Settings from './Settings';
+import AppHeader from './Header';
 //import reportWebVitals from './reportWebVitals';
 
 document.body.style.margin = 0;
 
+const AppDiv = styled.div`
+  font-family: Helvetica;
+`
+
 ReactDOM.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<App />}></Route>
-      <Route path="/video" element={<Video />}></Route>
-      <Route path="/settings" element={<Settings />}></Route>
-    </Routes>
-  </BrowserRouter>,
+  <AppDiv className="App">
+    <BrowserRouter>
+      <AppHeader />
+      <Routes>
+        <Route path="" element={<Home />}></Route>
+        <Route path="video" element={<Video />}></Route>
+        <Route path="settings" element={<Settings />}></Route>
+      </Routes>
+    </BrowserRouter>
+  </AppDiv>,
   document.getElementById('root')
 );

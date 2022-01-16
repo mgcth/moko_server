@@ -8,10 +8,7 @@ const AppDiv = styled.div`
 
 function Video() {
     return (
-        <AppDiv className="App">
-            <AppHeader />
-            <div></div>
-        </AppDiv>
+        <div></div>
     );
 }
 

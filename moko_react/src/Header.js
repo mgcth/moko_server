@@ -46,19 +46,19 @@ function AppHeader() {
       <Nav>
         <Ul>
           <Li><ALink
-            to="/"
+            to=""
             style={({ isActive }) =>
               isActive ? activeStyle : undefined
             }
           >moko</ALink></Li>
           <Li><ALink
-            to="/video"
+            to="video"
             style={({ isActive }) =>
               isActive ? activeStyle : undefined
             }
           >video</ALink></Li>
           <Li><ALink
-            to="/settings"
+            to="settings"
             style={({ isActive }) =>
               isActive ? activeStyle : undefined
             }

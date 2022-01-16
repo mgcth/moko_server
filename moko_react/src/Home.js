@@ -60,10 +60,10 @@ const Title = styled.h1`
 
 
 
-function App() {
+function Home() {
   return (
-    <AppDiv className="App">
-      <AppHeader />
+
+    <AppDiv className="Home">
 
       <Section className="App-header">
         <Title>
@@ -77,4 +77,4 @@ function App() {
   );
 }
 
-export default App;
+export default Home;
