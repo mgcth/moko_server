@@ -265,3 +265,4 @@ dist
 .vscode
 moko_flask/env
 moko_flask/__pycache__
+*.ttf
