@@ -5,13 +5,11 @@ import {
   Routes,
   Route
 } from "react-router-dom";
-import styled from 'styled-components'
 import { createGlobalStyle } from 'styled-components'
-import Home from './Home';
+import { Home, AddCamera, Camera } from './Home';
 import Settings from './Settings';
 import AppHeader from './Header';
 import AppFooter from './Footer';
-//import reportWebVitals from './reportWebVitals';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -28,8 +26,10 @@ ReactDOM.render(
       <BrowserRouter>
         <AppHeader />
         <Routes>
-          <Route path="" element={<Home />}></Route>
-          <Route path="settings" element={<Settings />}></Route>
+          <Route path="/*" element={<Home />} />
+          <Route path="settings/*" element={<Settings />} />
+          <Route path="camera-x" element={<Camera />} />
+          <Route path="add-camera" element={<AddCamera />} />
         </Routes>
         <AppFooter />
       </BrowserRouter>

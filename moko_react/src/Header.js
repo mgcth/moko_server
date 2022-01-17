@@ -59,18 +59,24 @@ function AppHeader() {
     <Header className="App-header">
       <Nav>
         <Ul>
-          <Li><ALink
-            to="video"
-            className={({ isActive }) =>
-              isActive ? "" : undefined
-            }
-          >moko</ALink></Li>
-          <Li><ALink
-            to="settings"
-            className={({ isActive }) =>
-              isActive ? "" : undefined
-            }
-          >settings</ALink></Li>
+          <Li>
+            <ALink
+              to=""
+              className={({ isActive }) =>
+                isActive ? "" : undefined
+              }>
+              moko
+            </ALink>
+          </Li>
+          <Li>
+            <ALink
+              to="settings"
+              className={({ isActive }) =>
+                isActive ? "" : undefined
+              }>
+              settings
+            </ALink>
+          </Li>
         </Ul>
       </Nav>
     </Header >
