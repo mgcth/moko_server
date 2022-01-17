@@ -3,19 +3,22 @@ import styled from 'styled-components'
 
 const Header = styled.header`
   background: papayawhip;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+
+  background: papayawhip;
 `
 
 const Nav = styled.nav`
-  padding: 0 1em;
-  background: papayawhip;
+
 `
 
 const Ul = styled.ul`
   list-style: none;
   display: flex;
-  column-gap: 1em;
   margin: 0;
-  padding: 1em;
+  padding: 0;
 `
 
 const Li = styled.li`
@@ -26,19 +29,21 @@ const ALink = styled(NavLink)`
   text-decoration: none;
   color: #000;
 
+  padding: 1em;
+  display: block;
+
   &:hover {
-    color: gray;
+    color: palevioletred;
   }
 
   &:visited {
     color: #000;
   }
-`
 
-let activeStyle = {
-  background: "#000",
-  color: "#000"
-};
+  &.active {
+    color: palevioletred;
+  }
+`
 
 function AppHeader() {
   return (
@@ -47,20 +52,20 @@ function AppHeader() {
         <Ul>
           <Li><ALink
             to=""
-            style={({ isActive }) =>
-              isActive ? activeStyle : undefined
+            className={({ isActive }) =>
+              isActive ? "" : undefined
             }
           >moko</ALink></Li>
           <Li><ALink
             to="video"
-            style={({ isActive }) =>
-              isActive ? activeStyle : undefined
+            className={({ isActive }) =>
+              isActive ? "" : undefined
             }
-          >video</ALink></Li>
+          >cameras</ALink></Li>
           <Li><ALink
             to="settings"
-            style={({ isActive }) =>
-              isActive ? activeStyle : undefined
+            className={({ isActive }) =>
+              isActive ? "" : undefined
             }
           >settings</ALink></Li>
         </Ul>

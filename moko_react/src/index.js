@@ -6,28 +6,34 @@ import {
   Route
 } from "react-router-dom";
 import styled from 'styled-components'
+import { createGlobalStyle } from 'styled-components'
 import Home from './Home';
-import Video from './Video';
+import Cameras from './Cameras';
 import Settings from './Settings';
 import AppHeader from './Header';
 //import reportWebVitals from './reportWebVitals';
 
-document.body.style.margin = 0;
-
-const AppDiv = styled.div`
-  font-family: Helvetica;
+const GlobalStyle = createGlobalStyle`
+  body {
+    margin: 0;
+    background: #fafafa;
+    font-family: Roboto, sans-serif;
+  }
 `
 
 ReactDOM.render(
-  <AppDiv className="App">
-    <BrowserRouter>
-      <AppHeader />
-      <Routes>
-        <Route path="" element={<Home />}></Route>
-        <Route path="video" element={<Video />}></Route>
-        <Route path="settings" element={<Settings />}></Route>
-      </Routes>
-    </BrowserRouter>
-  </AppDiv>,
+  <React.Fragment>
+    <GlobalStyle />
+    <div className="App">
+      <BrowserRouter>
+        <AppHeader />
+        <Routes>
+          <Route path="" element={<Home />}></Route>
+          <Route path="cameras" element={<Cameras />}></Route>
+          <Route path="settings" element={<Settings />}></Route>
+        </Routes>
+      </BrowserRouter>
+    </div>
+  </React.Fragment>,
   document.getElementById('root')
 );

@@ -6,17 +6,19 @@ const AppDiv = styled.div`
   font-family: Helvetica;
 `
 
-const Nav = styled.nav`
-  padding: 0 1em;
+const Header = styled.header`
   background: papayawhip;
+`
+
+const Nav = styled.nav`
 `
 
 const Ul = styled.ul`
   list-style: none;
   display: flex;
-  column-gap: 1em;
+  column-gap: 0;
   margin: 0;
-  padding: 1em;
+  padding: 0;
 `
 
 const Li = styled.li`
@@ -26,6 +28,7 @@ const Li = styled.li`
 const ALink = styled(NavLink)`
   text-decoration: none;
   color: #000;
+  padding: 0 1em;
 
   &:hover {
     color: gray;
@@ -36,18 +39,13 @@ const ALink = styled(NavLink)`
   }
 `
 
-const Header = styled.header`
-  background: papayawhip;
-`
-
 const Section = styled.section`
-  background: papayawhip;
   padding: 2em;
 `
 
 const Footer = styled.footer`
   text-align: center;
-  background: papayawhip;
+
   padding: 1em;
 `
 
@@ -66,6 +64,21 @@ function Home() {
     <AppDiv className="Home">
 
       <Section className="App-header">
+        <Title>
+          moko
+        </Title>
+        <Title>
+          moko
+        </Title>
+        <Title>
+          moko
+        </Title>
+        <Title>
+          moko
+        </Title>
+        <Title>
+          moko
+        </Title>
         <Title>
           moko
         </Title>
