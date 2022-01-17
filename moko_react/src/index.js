@@ -8,9 +8,9 @@ import {
 import styled from 'styled-components'
 import { createGlobalStyle } from 'styled-components'
 import Home from './Home';
-import Cameras from './Cameras';
 import Settings from './Settings';
 import AppHeader from './Header';
+import AppFooter from './Footer';
 //import reportWebVitals from './reportWebVitals';
 
 const GlobalStyle = createGlobalStyle`
@@ -29,9 +29,9 @@ ReactDOM.render(
         <AppHeader />
         <Routes>
           <Route path="" element={<Home />}></Route>
-          <Route path="cameras" element={<Cameras />}></Route>
           <Route path="settings" element={<Settings />}></Route>
         </Routes>
+        <AppFooter />
       </BrowserRouter>
     </div>
   </React.Fragment>,

@@ -8,6 +8,7 @@ const Header = styled.header`
   left: 20px;
 
   background: papayawhip;
+  text-transform: capitalize;
 `
 
 const Nav = styled.nav`
@@ -45,23 +46,25 @@ const ALink = styled(NavLink)`
   }
 `
 
+const ADiv = styled.div`
+  text-decoration: none;
+  color: #000;
+
+  padding: 1em;
+  display: block;
+`
+
 function AppHeader() {
   return (
     <Header className="App-header">
       <Nav>
         <Ul>
           <Li><ALink
-            to=""
-            className={({ isActive }) =>
-              isActive ? "" : undefined
-            }
-          >moko</ALink></Li>
-          <Li><ALink
             to="video"
             className={({ isActive }) =>
               isActive ? "" : undefined
             }
-          >cameras</ALink></Li>
+          >moko</ALink></Li>
           <Li><ALink
             to="settings"
             className={({ isActive }) =>

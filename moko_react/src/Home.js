@@ -1,14 +1,5 @@
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components'
-import AppHeader from './Header';
-
-const AppDiv = styled.div`
-  font-family: Helvetica;
-`
-
-const Header = styled.header`
-  background: papayawhip;
-`
 
 const Nav = styled.nav`
 `
@@ -16,7 +7,7 @@ const Nav = styled.nav`
 const Ul = styled.ul`
   list-style: none;
   display: flex;
-  column-gap: 0;
+  gap: 0.5em;
   margin: 0;
   padding: 0;
 `
@@ -40,53 +31,28 @@ const ALink = styled(NavLink)`
 `
 
 const Section = styled.section`
-  padding: 2em;
+  margin: 6em 0 0;
+  padding: 0 0 0 20px;
 `
 
-const Footer = styled.footer`
+const AddCamera = styled.li`
+  font-size: 3em;
   text-align: center;
-
+  color: palevioletred;
+  background: papayawhip;
+  margin: 0;
   padding: 1em;
 `
 
-const Title = styled.h1`
-  font-size: 1.5em;
-  text-align: center;
-  color: palevioletred;
-  margin: 0;
-`
-
-
-
 function Home() {
   return (
+    <Section className="Home">
+      <Ul>
+        <AddCamera>Camera 1</AddCamera>
+        <AddCamera>+</AddCamera>
+      </Ul>
 
-    <AppDiv className="Home">
-
-      <Section className="App-header">
-        <Title>
-          moko
-        </Title>
-        <Title>
-          moko
-        </Title>
-        <Title>
-          moko
-        </Title>
-        <Title>
-          moko
-        </Title>
-        <Title>
-          moko
-        </Title>
-        <Title>
-          moko
-        </Title>
-      </Section>
-
-      <Footer>Copyright (c) 2022 moko</Footer>
-
-    </AppDiv>
+    </Section >
   );
 }
 
