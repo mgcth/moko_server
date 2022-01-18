@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 const Header = styled.header`
   background: papayawhip;
@@ -9,22 +9,22 @@ const Header = styled.header`
 
   background: papayawhip;
   text-transform: capitalize;
-`
+`;
 
 const Nav = styled.nav`
 
-`
+`;
 
 const Ul = styled.ul`
   list-style: none;
   display: flex;
   margin: 0;
   padding: 0;
-`
+`;
 
 const Li = styled.li`
 
-`
+`;
 
 const ALink = styled(NavLink)`
   text-decoration: none;
@@ -44,7 +44,7 @@ const ALink = styled(NavLink)`
   &.active {
     color: palevioletred;
   }
-`
+`;
 
 const ADiv = styled.div`
   text-decoration: none;
@@ -52,7 +52,7 @@ const ADiv = styled.div`
 
   padding: 1em;
   display: block;
-`
+`;
 
 function AppHeader() {
   return (

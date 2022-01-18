@@ -1,5 +1,4 @@
-import { NavLink } from 'react-router-dom';
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 const Footer = styled.footer`
   background: papayawhip;
@@ -7,7 +6,7 @@ const Footer = styled.footer`
   bottom: 20px;
   left: 20px;
   padding: 1em;
-`
+`;
 
 function AppFooter() {
     return (

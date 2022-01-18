@@ -1,39 +1,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
-  BrowserRouter,
-  Routes,
-  Route
-} from "react-router-dom";
-import { createGlobalStyle } from 'styled-components'
-import { Home, AddCamera, Camera } from './Home';
-import Settings from './Settings';
-import AppHeader from './Header';
-import AppFooter from './Footer';
+import { createGlobalStyle } from 'styled-components';
+import App from './App.js';
 
 const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
+    padding: 0;
     background: #fafafa;
     font-family: Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-`
+
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  }
+
+`;
 
 ReactDOM.render(
   <React.Fragment>
     <GlobalStyle />
-    <div className="App">
-      <BrowserRouter>
-        <AppHeader />
-        <Routes>
-          <Route path="/*" element={<Home />} />
-          <Route path="settings/*" element={<Settings />} />
-          <Route path="camera-x" element={<Camera />} />
-          <Route path="add-camera" element={<AddCamera />} />
-        </Routes>
-        <AppFooter />
-      </BrowserRouter>
-    </div>
+    <App />
   </React.Fragment>,
   document.getElementById('root')
 );
