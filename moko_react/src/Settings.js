@@ -9,24 +9,32 @@ const Ul = styled.ul`
   list-style: none;
   column-gap: 1em;
   margin: 0;
-  padding: 1em;
+  padding: 0;
 `;
 
 const Li = styled.li`
-
 `;
 
 const Title = styled.h1`
-  background: papayawhip;
-  padding: 0.5em;
+  color: palevioletred;
+  padding: 0;
+`;
+
+const Div = styled.div`
 `;
 
 function Settings() {
   return (
     <Section>
       <Ul>
-        <Li>Settings 1</Li>
-        <Li>Settings 1</Li>
+        <Li>
+          <Title>Authentification</Title>
+          <Div>Auth settings and info.</Div>
+        </Li>
+        <Li>
+          <Title>Preferences</Title>
+          <Div>Some general preferences.</Div>
+        </Li>
       </Ul>
     </Section>
   );

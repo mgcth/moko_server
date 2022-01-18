@@ -6,6 +6,7 @@ import App from './App.js';
 const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
+    padding: 0;
     background: #fafafa;
     font-family: Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -19,6 +20,9 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 ReactDOM.render(
-  <App />,
+  <React.Fragment>
+    <GlobalStyle />
+    <App />
+  </React.Fragment>,
   document.getElementById('root')
 );

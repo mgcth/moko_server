@@ -51,8 +51,6 @@ const CameraSettingsPane = styled.div`
   right: 20px;
   margin: 0 0 20px 20px;
   padding: 1em;
-
-  background: papayawhip;
   text-transform: capitalize;
 `;
 
@@ -61,13 +59,7 @@ function CameraSettings() {
     <CameraSettingsPane>
       <Ul>
         <Li>
-          Testing
-          Testing
-          CameraSettingsPane
-          CameraSettingsPane
-          CameraSettingsPane
-          CameraSettingsPane
-          CameraSettingsPane
+
         </Li>
       </Ul>
     </CameraSettingsPane>
