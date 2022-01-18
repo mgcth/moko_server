@@ -1,32 +1,28 @@
 import React from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route
-} from "react-router-dom";
 import { Link } from 'react-router-dom';
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 const Nav = styled.nav`
-`
+`;
 
 const Ul = styled.ul`
   list-style: none;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5em;
   margin: 0;
   padding: 0;
-`
+`;
 
 const Li = styled.li`
 
-`
+`;
 
 
 const Section = styled.section`
-  margin: 6em 0 0;
-  padding: 0 0 0 20px;
-`
+  margin: 6em 0;
+  padding: 0 20px;
+`;
 
 
 const CameraLink = styled(Link)`
@@ -46,7 +42,38 @@ const CameraLink = styled(Link)`
   &:hover {
     color: #000;
   }
-`
+`;
+
+const CameraSettingsPane = styled.div`
+  background: papayawhip;
+  position: fixed;
+  top: 6em;
+  right: 20px;
+  margin: 0 0 20px 20px;
+  padding: 1em;
+
+  background: papayawhip;
+  text-transform: capitalize;
+`;
+
+function CameraSettings() {
+  return (
+    <CameraSettingsPane>
+      <Ul>
+        <Li>
+          Testing
+          Testing
+          CameraSettingsPane
+          CameraSettingsPane
+          CameraSettingsPane
+          CameraSettingsPane
+          CameraSettingsPane
+        </Li>
+      </Ul>
+    </CameraSettingsPane>
+  );
+}
+
 
 function AddCamera() {
   return (
@@ -59,32 +86,30 @@ function AddCamera() {
 function Camera() {
   return (
     <Section>
-      Hi there camera x
+      <CameraSettings />
     </Section>
   );
 }
 
+// For now, read from server later
+const cameraList = ["Camera 1", "Camera 2", "Camera 3"]
 
 function Home() {
   return (
-    <React.Fragment>
-      <Section className="Home">
-        <Ul>
-          <Li>
-            <CameraLink to="camera-x">
-              Camera 1
-            </CameraLink>
-          </Li>
-          <Li>
-            <CameraLink to="add-camera">
-              +
-            </CameraLink>
-          </Li>
-        </Ul>
-      </Section>
-    </React.Fragment>
+    <Section className="Home">
+      <Ul>
+        {cameraList.map(camera => {
+          return <Li key={camera}><CameraLink to="camera-x">{camera}</CameraLink></Li>
+        })}
+        <Li>
+          <CameraLink to="add-camera">
+            +
+          </CameraLink>
+        </Li>
+      </Ul>
+    </Section >
   );
 }
 
 export default Home;
-export { Home, AddCamera, Camera }
+export { Home, AddCamera, Camera };
