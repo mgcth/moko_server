@@ -1,7 +1,18 @@
-from flask import Flask
+from flask import Flask, jsonify
+from picamera import PiCamera
 
 app = Flask(__name__)
 
-@app.route('/hello')
-def say_hello_world():
-    return {'result': "Hello World"}
+CAMERA_MAP = {
+    "ov5647": "V1 module",
+    "imx219": "V2 module"
+}
+
+@app.route('/cameras')
+def get_cameras():
+
+    camera = PiCamera()
+    module = camera.revision
+    camera.close()
+
+    return jsonify({"camera": CAMERA_MAP[module]})
