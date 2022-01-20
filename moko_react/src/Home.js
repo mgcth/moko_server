@@ -54,6 +54,12 @@ const CameraSettingsPane = styled.div`
   text-transform: capitalize;
 `;
 
+const Img = styled.img`
+  object-fit: cover;
+  width: 100%;
+  max-height: 400px;
+`
+
 const fetchData = () => {
   return fetch("https://moko:5000/cameras")
     .then((response) => response.json())
@@ -87,7 +93,7 @@ function CameraSettings() {
     <CameraSettingsPane>
       <Ul>
         <Li>
-          <img src={img} alt="stream" />
+          <Img src={img} alt="stream" />
         </Li>
       </Ul>
     </CameraSettingsPane>
