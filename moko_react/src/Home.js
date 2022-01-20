@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -60,19 +60,28 @@ const fetchData = () => {
     .then((data) => console.log(data))
 }
 
-const ws = new WebSocket("ws://192.168.1.105:5000/stream");
 
 function CameraSettings() {
+  const wsRef = useRef();
   const [img, setImg] = useState();
 
-  ws.onmessage = function (event) {
-    const data = event.data;
-    try {
-      setImg(data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  if (!wsRef.current) {
+    wsRef.current = new WebSocket("ws://192.168.1.105:5000/stream");
+  }
+
+  if (wsRef.current) {
+    wsRef.current.onmessage = function (event) {
+      const data = event.data;
+      try {
+        setImg(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+  }
+
+
+
 
   return (
     <CameraSettingsPane>
