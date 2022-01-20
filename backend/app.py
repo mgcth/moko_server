@@ -9,31 +9,6 @@ from picamera import PiCamera
 app = Sanic(__name__)
 
 
-class CameraManager:
-    """
-    """
-
-    def __init__(self):
-        """
-        """
-
-        self.camera = None
-
-    def start(self):
-
-        try:
-            print(self.camera)
-            self.camera.close()
-        except:
-            self.camera = Camera()
-
-    def close(self):
-        """
-        """
-
-        self.camera.close()
-
-
 class Camera():
     """
     """
@@ -48,11 +23,14 @@ class Camera():
         }
         self.camera = PiCamera(resolution=resolution)
 
-    def __del__():
+    def __del__(self):
         """
         """
 
-        self.camera.close()
+        try:
+            self.camera.close()
+        except:
+            pass  # avoid and fix, just testing
 
     def __enter__(self):
         """
@@ -92,17 +70,7 @@ class Camera():
             yield stream.read()
             stream.truncate()
             stream.seek(0)
-            #await asyncio.sleep(1/30)
 
-    # async def stream(self, response):
-    #     """
-    #     """
-
-    #     async for frame in self.frames():
-    #         await response.write(
-    #            b"--frame\r\n"
-    #            b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n"
-    #         )
 
 @app.route("/cameras")
 async def camera(request):
@@ -125,33 +93,16 @@ async def stream(request, ws):
     """
     """
 
-    # async def stream(response):
-    #     """
-    #     """
-
-    #     async for frame in camera.frames():
-    #         await response.write(
-    #            b"--frame\r\n"
-    #            b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n"
-    #         )
-
-
-
     camera = Camera()
-    
     while True:
+        await asyncio.sleep(0.1)
         frames = camera.frames()
         frame = next(frames)
         await ws.send(
            f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
         )
 
-    #return response.stream(
-    #    stream,
-    #    content_type="multipart/x-mixed-replace; boundary=frame"
-    #)
-
 
 if __name__ == "__main__":
-    #cm = CameraManager()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)
+    
