@@ -60,11 +60,10 @@ const fetchData = () => {
     .then((data) => console.log(data))
 }
 
+const ws = new WebSocket("ws://192.168.1.105:5000/stream");
+
 function CameraSettings() {
   const [img, setImg] = useState();
-
-  const ws = new WebSocket("ws://192.168.1.105:5000/stream");
-
 
   ws.onmessage = function (event) {
     const data = event.data;
