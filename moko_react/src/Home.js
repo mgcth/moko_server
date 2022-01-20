@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -54,12 +54,32 @@ const CameraSettingsPane = styled.div`
   text-transform: capitalize;
 `;
 
+const fetchData = () => {
+  return fetch("https://moko:5000/cameras")
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+}
+
 function CameraSettings() {
+  const [img, setImg] = useState();
+
+  const ws = new WebSocket("ws://192.168.1.105:5000/stream");
+
+
+  ws.onmessage = function (event) {
+    const data = event.data;
+    try {
+      setImg(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <CameraSettingsPane>
       <Ul>
         <Li>
-
+          <img src={img} alt="stream" />
         </Li>
       </Ul>
     </CameraSettingsPane>
@@ -70,7 +90,7 @@ function CameraSettings() {
 function AddCamera() {
   return (
     <Section>
-      Hi there
+      <CameraSettings />
     </Section>
   );
 }
