@@ -13,7 +13,7 @@ class Camera():
     """
     """
 
-    def __init__(self, resolution=(640, 480)):
+    def __init__(self, resolution=(1280, 720)):
         """
         """
 
@@ -27,10 +27,10 @@ class Camera():
         """
         """
 
-        try:
-            self.camera.close()
-        except:
-            pass  # avoid and fix, just testing
+        #try:
+        self.camera.close()
+        #except:
+        #    pass  # avoid and fix, just testing
 
     def __enter__(self):
         """
@@ -42,7 +42,7 @@ class Camera():
         """
         """
 
-        self.camera.close()
+        self.close()
 
     def close(self):
         """
@@ -95,14 +95,14 @@ async def stream(request, ws):
 
     camera = Camera()
     while True:
-        await asyncio.sleep(0.1)
-        frames = camera.frames()
-        frame = next(frames)
+        await asyncio.sleep(0.01)
+        frame = next(camera.frames())
         await ws.send(
            f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
         )
 
+    camera.close()
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
-    
