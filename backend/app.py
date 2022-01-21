@@ -3,6 +3,7 @@ import asyncio
 from io import BytesIO
 from sanic import Sanic
 from sanic import response
+from websockets.exceptions import ConnectionClosed
 from sanic.response import json
 from picamera import PiCamera
 
@@ -94,15 +95,18 @@ async def stream(request, ws):
     """
 
     camera = Camera()
-    while True:
-        await asyncio.sleep(0.01)
-        frame = next(camera.frames())
-        await ws.send(
-           f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
-        )
-
-    camera.close()
-
+    try:
+        while True:
+            await asyncio.sleep(0.01)
+            frame = next(camera.frames())
+            await ws.send(
+               f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
+            )
+    except:
+        print("Closing connection.")
+    finally:
+        camera.close()
+        
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
