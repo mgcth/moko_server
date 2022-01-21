@@ -28,7 +28,7 @@ function Settings() {
     <Section>
       <Ul>
         <Li>
-          <Title>Authentification</Title>
+          <Title>Authentication</Title>
           <Div>Auth settings and info.</Div>
         </Li>
         <Li>
