@@ -1,3 +1,4 @@
+import sys
 import base64
 import asyncio
 from io import BytesIO
@@ -5,10 +6,14 @@ from sanic import Sanic
 from sanic import response
 from websockets.exceptions import ConnectionClosed
 from sanic.response import json
-from picamera import PiCamera
+from picamera import PiCamera, PiCameraCircularIO
 
 app = Sanic(__name__)
 
+app.config.WEBSOCKET_MAX_SIZE = 2 ** 20  # 20
+app.config.WEBSOCKET_MAX_QUEUE = 32  # 32
+app.config.WEBSOCKET_READ_LIMIT = 2 ** 16 # 16
+app.config.WEBSOCKET_WRITE_LIMIT = 2 ** 16 # 16
 
 class Camera():
     """
@@ -22,7 +27,8 @@ class Camera():
             "ov5647": "V1 module",
             "imx219": "V2 module"
         }
-        self.camera = PiCamera(resolution=resolution)
+        self.camera = PiCamera(resolution=resolution,framerate=30)
+        self.camera.rotation = 180
 
     def __del__(self):
         """
@@ -65,7 +71,7 @@ class Camera():
         """
 
         stream = BytesIO()
-        for _ in self.camera.capture_continuous(stream, "jpeg", use_video_port=True):
+        for _ in self.camera.capture_continuous(stream, "jpeg", use_video_port=True, quality=20):
             stream.seek(0)
             yield stream.read()
             stream.truncate()
@@ -87,7 +93,6 @@ async def index(request):
 
     return response.html('''Hi''')
 
-
 @app.websocket("/stream")
 async def stream(request, ws):
     """
@@ -98,6 +103,7 @@ async def stream(request, ws):
         while True:
             await asyncio.sleep(0.01)
             frame = next(camera.frames())
+            print(sys.getsizeof(frame))
             await ws.send(
                f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
             )
