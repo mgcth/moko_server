@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link } from 'react-router-dom';
+import { Link, renderMatches } from 'react-router-dom';
 import styled from 'styled-components';
 import Select from 'react-select'
 
@@ -133,6 +133,7 @@ function AddCamera() {
   return (
     <Section>
       <CameraSettings />
+      <CS />
     </Section>
   );
 }
@@ -149,21 +150,55 @@ function Camera() {
 const cameraList = ["Camera 1", "Camera 2", "Camera 3"]
 
 function CS() {
-  return fetch('http://192.168.1.105:5000/cameras')
-    .then((response) => response.json())
-    .then((responseJson) => {
-      console.log(responseJson)
-      return responseJson;
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  const [error, setError] = useState(null)
+  const [module, setModule] = useState([])
+  const [modes, setModes] = useState([])
+
+  useEffect(() => {
+    fetch('http://192.168.1.105:5000/cameras')
+      .then(res => res.json())
+      .then(
+        (result) => {
+          setModule(result.module);
+          setModes(result.modes);
+        },
+        (err) => {
+          console.error(err);
+          setError(err);
+        }
+      )
+  }, [])
+
+  if (modes == []) {
+    return <div>Error: {error.message}</div>;
+  } else {
+    return (
+      <div>
+
+        <Label>Module</Label>
+        {console.log(module)}
+        <Select options={module} />
+
+        <Label>Modes</Label>
+        <Select options={
+          modes.map(item => (
+            {
+              value: item,
+              label: item + "bla"
+            }
+          ))
+        } />
+
+      </div>
+
+
+    )
+  }
 }
 
 function Home() {
   return (
     <Section className="Home">
-      <CS />
       <Ul>
         {cameraList.map(camera => {
           return <Li key={camera}><CameraLink to="camera-x">{camera}</CameraLink></Li>
