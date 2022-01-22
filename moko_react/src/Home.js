@@ -46,9 +46,9 @@ const CameraLink = styled(Link)`
 `;
 
 const Img = styled.img`
-  object-fit: cover;
+  /* object-fit: cover;
   width: 100%;
-  max-height: 720px;
+  max-height: 720px; */
 `
 
 const fetchData = () => {
@@ -86,11 +86,7 @@ function CameraStream() {
   }, [])
 
   return (
-    <Ul>
-      <Li>
-        <Img src={img} alt="stream" />
-      </Li>
-    </Ul>
+    <Img src={img} alt="stream" />
   );
 }
 
@@ -143,7 +139,7 @@ function AddCamera() {
 
 function Camera() {
   return (
-    <Section>
+    <Section className="camera-stream">
       <CameraStream />
     </Section>
   );
@@ -152,9 +148,22 @@ function Camera() {
 // For now, read from server later
 const cameraList = ["Camera 1", "Camera 2", "Camera 3"]
 
+function CS() {
+  return fetch('http://192.168.1.105:5000/cameras')
+    .then((response) => response.json())
+    .then((responseJson) => {
+      console.log(responseJson)
+      return responseJson;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
 function Home() {
   return (
     <Section className="Home">
+      <CS />
       <Ul>
         {cameraList.map(camera => {
           return <Li key={camera}><CameraLink to="camera-x">{camera}</CameraLink></Li>
