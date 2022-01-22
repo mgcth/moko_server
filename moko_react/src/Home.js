@@ -1,6 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import Select from 'react-select'
 
 const Nav = styled.nav`
 `;
@@ -44,20 +45,10 @@ const CameraLink = styled(Link)`
   }
 `;
 
-const CameraSettingsPane = styled.div`
-  background: papayawhip;
-  position: fixed;
-  top: 6em;
-  right: 20px;
-  margin: 0 0 20px 20px;
-  padding: 1em;
-  text-transform: capitalize;
-`;
-
 const Img = styled.img`
   object-fit: cover;
   width: 100%;
-  max-height: 400px;
+  max-height: 720px;
 `
 
 const fetchData = () => {
@@ -67,39 +58,80 @@ const fetchData = () => {
 }
 
 
-function CameraSettings() {
-  const wsRef = useRef();
+function CameraStream() {
+  const wsRef = useRef(null);
   const [img, setImg] = useState();
 
-  if (!wsRef.current) {
-    wsRef.current = new WebSocket("ws://192.168.1.105:5000/stream");
-  }
+  useEffect(() => {
+    if (!wsRef.current) {
+      wsRef.current = new WebSocket("ws://192.168.1.105:5000/stream");
+    }
 
-  if (wsRef.current) {
-    wsRef.current.onmessage = function (event) {
-      const data = event.data;
-      try {
-        setImg(data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-  }
+    if (wsRef.current) {
+      wsRef.current.onmessage = function (event) {
+        const data = event.data;
+        try {
+          setImg(data);
+        } catch (err) {
+          setImg(null)
+          console.log(err);
+        }
+      };
+    }
 
-
-
+    return () => {
+      wsRef.current.close()
+      wsRef.current = null
+    }
+  }, [])
 
   return (
-    <CameraSettingsPane>
-      <Ul>
-        <Li>
-          <Img src={img} alt="stream" />
-        </Li>
-      </Ul>
-    </CameraSettingsPane>
+    <Ul>
+      <Li>
+        <Img src={img} alt="stream" />
+      </Li>
+    </Ul>
   );
 }
 
+const CameraSettingsPane = styled.div`
+  background: papayawhip;
+  margin: 6em 0 ;
+  padding: 1em;
+  text-transform: capitalize;
+`;
+
+const Label = styled.label`
+  font-weight: bold;
+`
+
+const options = [
+  { value: '720', label: '1280 x 720' },
+  { value: '1080', label: '1920 x 1080' }
+]
+
+const MyComponent = () => (
+  <CameraSettingsPane>
+    <div>
+
+      <Label>Resolution</Label>
+      <Select options={options} />
+
+    </div>
+    <div>
+
+      <Label>Resolution</Label>
+      <Select options={options} />
+
+    </div>
+  </CameraSettingsPane>
+)
+
+function CameraSettings() {
+  return (
+    <MyComponent />
+  )
+}
 
 function AddCamera() {
   return (
@@ -112,7 +144,7 @@ function AddCamera() {
 function Camera() {
   return (
     <Section>
-      <CameraSettings />
+      <CameraStream />
     </Section>
   );
 }
