@@ -65,7 +65,6 @@ class Camera():
         """
 
         stream = BytesIO()
-
         for _ in self.camera.capture_continuous(stream, "jpeg", use_video_port=True):
             stream.seek(0)
             yield stream.read()
@@ -86,7 +85,7 @@ async def index(request):
     """
     """
 
-    return response.html('''<img src="/stream">''')
+    return response.html('''Hi''')
 
 
 @app.websocket("/stream")
