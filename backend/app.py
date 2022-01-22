@@ -8,6 +8,8 @@ from websockets.exceptions import ConnectionClosed
 from sanic.response import json
 from picamera import PiCamera, PiCameraCircularIO
 
+from camera_settings import CameraSettings
+
 app = Sanic(__name__)
 
 app.config.WEBSOCKET_MAX_SIZE = 2 ** 20  # 20
@@ -23,6 +25,10 @@ class Camera():
         """
         """
 
+        #self.module = None
+        #self.mode = None
+
+        self.settings = CameraSettings()
         self.camera_map = {
             "ov5647": "V1 module",
             "imx219": "V2 module"
@@ -57,14 +63,24 @@ class Camera():
 
         self.camera.close()
 
-    def get_camera(self):
+    @property
+    def module(self):
         """
         """
 
         module = self.camera.revision
-        model = self.camera_map.get(module, "none")
+        model = self.settings.module.get(module, "none")
 
         return model
+
+    @property
+    def modes(self):
+        """
+        """
+
+        modes = self.settings.modes.get(self.module, "none")
+
+        return modes
 
     def frames(self):
         """
@@ -84,7 +100,11 @@ async def camera(request):
     """
 
     with Camera() as camera:
-        return json({"camera": camera.get_camera()})
+        response = json({
+            "module": camera.module,
+            "modes": camera.modes
+            })
+        return response
 
 @app.route("/")
 async def index(request):
