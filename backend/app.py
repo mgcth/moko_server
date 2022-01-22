@@ -4,6 +4,7 @@ import asyncio
 from io import BytesIO
 from sanic import Sanic
 from sanic import response
+from sanic_cors import CORS, cross_origin
 from websockets.exceptions import ConnectionClosed
 from sanic.response import json
 from picamera import PiCamera, PiCameraCircularIO
@@ -16,6 +17,8 @@ app.config.WEBSOCKET_MAX_SIZE = 2 ** 20  # 20
 app.config.WEBSOCKET_MAX_QUEUE = 32  # 32
 app.config.WEBSOCKET_READ_LIMIT = 2 ** 16 # 16
 app.config.WEBSOCKET_WRITE_LIMIT = 2 ** 16 # 16
+
+CORS(app)
 
 class Camera():
     """
@@ -78,7 +81,7 @@ class Camera():
         """
         """
 
-        modes = self.settings.modes.get(self.module, "none")
+        modes = self.settings.modes.get(self.module[0], "none")
 
         return modes
 
@@ -131,6 +134,7 @@ async def stream(request, ws):
         print("Closing connection.")
     finally:
         camera.close()
+
         
 
 if __name__ == "__main__":

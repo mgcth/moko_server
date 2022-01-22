@@ -13,8 +13,8 @@ class CameraSettings:
         """
 
         self.module = {
-            "ov5647": "V1",
-            "imx219": "V2"
+            "ov5647": ["V1"],
+            "imx219": ["V2"]
         }
 
         self.modes = {
