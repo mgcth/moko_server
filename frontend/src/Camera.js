@@ -57,15 +57,19 @@ const Img = styled.img`
   max-height: 720px; */
 `
 
-const fetchData = () => {
-  return fetch(host + host_camera_config)
-    .then((response) => response.json())
-    .then((data) => console.log(data))
-}
+const CameraSettingsPane = styled.div`
+  background: papayawhip;
+  margin: 1em 0;
+  padding: 1em;
+  text-transform: capitalize;
+`;
 
+const Label = styled.label`
+  font-weight: bold;
+`
 
 const useFetchGet = (url) => {
-  const [data, setData] = useState(null)
+  const [data, setData] = useState([])
   const [error, setError] = useState(null)
 
   useEffect(() => {
@@ -132,28 +136,17 @@ function CameraStream() {
   );
 }
 
-const CameraSettingsPane = styled.div`
-  background: papayawhip;
-  margin: 1em 0;
-  padding: 1em;
-  text-transform: capitalize;
-`;
-
-const Label = styled.label`
-  font-weight: bold;
-`
-
 function CameraModules() {
   const { data, error } = useFetchGet(host + host_camera_config)
 
   return (
     <div>
       <Label>Module</Label>
-      <Select options={data && data.module.map(item => (
+      <Select options={"module" in data && data.module.map(item => (
         { label: item, value: item }
       ))
       } />
-      {console.log(data.module)}
+
     </div>
   )
 }
@@ -164,7 +157,7 @@ function CameraModes() {
   return (
     <div>
       <Label>Modes</Label>
-      <Select options={
+      <Select options={"modes" in data &&
         data.modes.map(item => (
           {
             value: item,
@@ -172,7 +165,6 @@ function CameraModes() {
           }
         ))
       } />
-      {console.log(data.modes)}
     </div>
   )
 }
