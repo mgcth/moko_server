@@ -7,9 +7,9 @@ from sanic import response
 from sanic_cors import CORS, cross_origin
 from websockets.exceptions import ConnectionClosed
 from sanic.response import json
-from picamera import PiCamera, PiCameraCircularIO
 
-from camera_settings import CameraSettings
+from camera import Camera
+
 
 app = Sanic(__name__)
 
@@ -20,84 +20,9 @@ app.config.WEBSOCKET_WRITE_LIMIT = 2 ** 16 # 16
 
 CORS(app)
 
-class Camera():
-    """
-    """
+camera_list_file = "../../camera_list.json"
 
-    def __init__(self, resolution=(1280, 720)):
-        """
-        """
-
-        #self.module = None
-        #self.mode = None
-
-        self.settings = CameraSettings()
-        self.camera_map = {
-            "ov5647": "V1 module",
-            "imx219": "V2 module"
-        }
-        self.camera = PiCamera(resolution=resolution,framerate=30)
-        self.camera.rotation = 180
-
-    def __del__(self):
-        """
-        """
-
-        #try:
-        self.camera.close()
-        #except:
-        #    pass  # avoid and fix, just testing
-
-    def __enter__(self):
-        """
-        """
-
-        return self
-
-    def __exit__(self, type, value, traceback):
-        """
-        """
-
-        self.close()
-
-    def close(self):
-        """
-        """
-
-        self.camera.close()
-
-    @property
-    def module(self):
-        """
-        """
-
-        module = self.camera.revision
-        model = self.settings.module.get(module, "none")
-
-        return model
-
-    @property
-    def modes(self):
-        """
-        """
-
-        modes = self.settings.modes.get(self.module[0], "none")
-
-        return modes
-
-    def frames(self):
-        """
-        """
-
-        stream = BytesIO()
-        for _ in self.camera.capture_continuous(stream, "jpeg", use_video_port=True, quality=20):
-            stream.seek(0)
-            yield stream.read()
-            stream.truncate()
-            stream.seek(0)
-
-
-@app.route("/cameras")
+@app.route("/camera-config")
 async def camera(request):
     """
     """
@@ -109,12 +34,35 @@ async def camera(request):
             })
         return response
 
+
+@app.route("/read-camera")
+async def camera(request):
+    """
+    """
+
+    with open(camera_list_file, "r") as file:
+        json = json.load(file)
+        return json
+
+
+@app.route("/save-camera")
+async def camera(request):
+    """
+    """
+
+    print(request)
+    #with open(camera_list_file, "wr") as file:
+    #    file.write(request)
+    return json({"1": 2})
+
+
 @app.route("/")
 async def index(request):
     """
     """
 
     return response.html('''Hi''')
+
 
 @app.websocket("/stream")
 async def stream(request, ws):
@@ -135,7 +83,6 @@ async def stream(request, ws):
     finally:
         camera.close()
 
-        
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
