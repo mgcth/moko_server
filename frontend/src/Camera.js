@@ -64,6 +64,42 @@ const fetchData = () => {
 }
 
 
+const useFetchGet = (url) => {
+  const [data, setData] = useState(null)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const abortCont = new AbortController();
+
+    fetch(url, { signal: abortCont.signal })
+      .then(res => {
+        if (!res.ok) {
+          throw Error("Could not fetch data.")
+        }
+        return res.json()
+      })
+      .then(res => {
+        setData(res);
+        setError(null);
+      })
+      .catch(err => {
+        if (err.name === "AbortError") {
+          console.log("Aborted fetch.")
+        } else {
+          console.error(err);
+          setError(err.message);
+        }
+      }
+      )
+
+    return () => abortCont.abort;
+  }, [url])
+
+  return { data, error }
+}
+
+
+
 function CameraStream() {
   const wsRef = useRef(null);
   const [img, setImg] = useState();
@@ -108,78 +144,42 @@ const Label = styled.label`
 `
 
 function CameraModules() {
-  const [error, setError] = useState(null)
-  const [module, setModule] = useState([])
+  const { data, error } = useFetchGet(host + host_camera_config)
 
-  useEffect(() => {
-    fetch(host + host_camera_config)
-      .then(res => res.json())
-      .then(
-        (result) => {
-          setModule(result.module);
-        },
-        (err) => {
-          console.error(err);
-          setError(err);
-        }
-      )
-  }, [])
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  } else {
-    return (
-      <div>
-        <Label>Module</Label>
-        {console.log(module)}
-        <Select options={module.map(item => (
-          { label: item, value: item }
-        ))
-        } />
-      </div>
-    )
-  }
+  return (
+    <div>
+      <Label>Module</Label>
+      <Select options={data && data.module.map(item => (
+        { label: item, value: item }
+      ))
+      } />
+      {console.log(data.module)}
+    </div>
+  )
 }
 
 function CameraModes() {
-  const [error, setError] = useState(null)
-  const [modes, setModes] = useState([])
+  const { data, error } = useFetchGet(host + host_camera_config)
 
-  useEffect(() => {
-    fetch(host + host_camera_config)
-      .then(res => res.json())
-      .then(
-        (result) => {
-          setModes(result.modes);
-        },
-        (err) => {
-          console.error(err);
-          setError(err);
-        }
-      )
-  }, [])
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  } else {
-    return (
-      <div>
-        <Label>Modes</Label>
-        {console.log(modes)}
-        <Select options={
-          modes.map(item => (
-            {
-              value: item,
-              label: item[0][0] + "x" + item[0][1] + ", FPS: " + item[1][0] + ":" + item[1][1] + ", FoV: " + item[4]
-            }
-          ))
-        } />
-      </div>
-    )
-  }
+  return (
+    <div>
+      <Label>Modes</Label>
+      <Select options={
+        data.modes.map(item => (
+          {
+            value: item,
+            label: item[0][0] + "x" + item[0][1] + ", FPS: " + item[1][0] + ":" + item[1][1] + ", FoV: " + item[4]
+          }
+        ))
+      } />
+      {console.log(data.modes)}
+    </div>
+  )
 }
 
 function CameraSave() {
+  const [addCamera, setAddCamera] = useState()
+
   useEffect(() => {
     const requestOptions = {
       method: 'POST',
@@ -191,10 +191,10 @@ function CameraSave() {
     fetch(host + host_save_cameras, requestOptions)
     // .then(response => response.json())
     // .then(data => setPostId(data.id));
-  }, []);
+  }, [addCamera]);
 
   return (
-    1
+    <button onClick={() => setAddCamera()}>Add camera</button>
   )
 }
 
