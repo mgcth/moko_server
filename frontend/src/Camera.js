@@ -138,6 +138,13 @@ function CameraStream() {
 
 function CameraModules() {
   const { data, error } = useFetchGet(host + host_camera_config)
+  const [module, setModule] = useState(null)
+
+  const [handleChange] = useState((e) => {
+    return (e) => {
+      setModule(e.value);
+    };
+  });
 
   return (
     <div>
@@ -145,14 +152,21 @@ function CameraModules() {
       <Select options={"module" in data && data.module.map(item => (
         { label: item, value: item }
       ))
-      } />
-
+      } onChange={handleChange} />
+      {module}
     </div>
   )
 }
 
 function CameraModes() {
   const { data, error } = useFetchGet(host + host_camera_config)
+  const [mode, setMode] = useState(null)
+
+  const [handleChange] = useState((e) => {
+    return (e) => {
+      setMode(e.value);
+    };
+  });
 
   return (
     <div>
@@ -164,7 +178,8 @@ function CameraModes() {
             label: item[0][0] + "x" + item[0][1] + ", FPS: " + item[1][0] + ":" + item[1][1] + ", FoV: " + item[4]
           }
         ))
-      } />
+      } onChange={handleChange} />
+      {mode}
     </div>
   )
 }
