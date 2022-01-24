@@ -20,7 +20,7 @@ app.config.WEBSOCKET_WRITE_LIMIT = 2 ** 16 # 16
 
 CORS(app)
 
-camera_list_file = "../../camera_list.json"
+CAMERA_LIST_FILE = "../../camera_list.json"
 
 @app.route("/camera-config")
 async def camera(request):
@@ -30,7 +30,7 @@ async def camera(request):
     with Camera() as camera:
         response = json({
             "module": camera.module,
-            "modes": camera.modes
+            "modes": camera.modes,
             })
         return response
 
@@ -40,19 +40,18 @@ async def camera(request):
     """
     """
 
-    with open(camera_list_file, "r") as file:
+    with open(CAMERA_LIST_FILE, "r") as file:
         json = json.load(file)
         return json
 
 
-@app.route("/save-camera")
+@app.route("/save-camera", methods=["POST"])
 async def camera(request):
     """
     """
 
-    print(request)
-    #with open(camera_list_file, "wr") as file:
-    #    file.write(request)
+    with open(CAMERA_LIST_FILE, "a") as file:
+        file.write(str(request.json))
     return json({"1": 2})
 
 
