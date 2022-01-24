@@ -35,14 +35,14 @@ async def camera(request):
         return response
 
 
-@app.route("/read-camera")
+@app.route("/read-cameras")
 async def camera(request):
     """
     """
 
     with open(CAMERA_LIST_FILE, "r") as file:
-        json = json.load(file)
-        return json
+        response = json(file.read())
+        return response
 
 
 @app.route("/save-camera", methods=["POST"])
