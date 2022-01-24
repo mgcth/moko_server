@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, renderMatches } from 'react-router-dom';
 import styled from 'styled-components';
 import { Camera, AddCamera } from './Camera.js'
+import { useFetchGet } from "./useFetchGet.js"
 
 const Nav = styled.nav`
 `;
@@ -51,12 +52,17 @@ const Img = styled.img`
   max-height: 720px; */
 `
 
-// For now, read from server later
-const cameraList = ["Camera 1", "Camera 2", "Camera 3"]
+const cameraList = ["Camera 1"]
+
+const host = "http://moko:5000"
+const host_read_cameras = "/read-cameras"
 
 function Home() {
+  const { data, error } = useFetchGet(host + host_read_cameras)
+
   return (
     <Section className="Home">
+      {console.log(data)}
       <Ul>
         {cameraList.map(camera => {
           return <Li key={camera}><CameraLink to="camera-x">{camera}</CameraLink></Li>

@@ -1,7 +1,9 @@
+import 'bootstrap/dist/css/bootstrap.css';
 import React, { useState, useRef, useEffect } from "react";
 import { Link, renderMatches } from 'react-router-dom';
 import styled from 'styled-components';
 import Select from 'react-select';
+import { useFetchGet } from "./useFetchGet.js"
 
 
 const host = "http://moko:5000"
@@ -68,39 +70,7 @@ const Label = styled.label`
   font-weight: bold;
 `
 
-const useFetchGet = (url) => {
-  const [data, setData] = useState([])
-  const [error, setError] = useState(null)
 
-  useEffect(() => {
-    const abortCont = new AbortController();
-
-    fetch(url, { signal: abortCont.signal })
-      .then(res => {
-        if (!res.ok) {
-          throw Error("Could not fetch data.")
-        }
-        return res.json()
-      })
-      .then(res => {
-        setData(res);
-        setError(null);
-      })
-      .catch(err => {
-        if (err.name === "AbortError") {
-          console.log("Aborted fetch.")
-        } else {
-          console.error(err);
-          setError(err.message);
-        }
-      }
-      )
-
-    return () => abortCont.abort;
-  }, [url])
-
-  return { data, error }
-}
 
 
 
@@ -197,7 +167,7 @@ function CameraSave({ cameraState }) {
   }, [addCamera]);
 
   return (
-    <button onClick={() => setAddCamera(cameraState)}>Add camera</button>
+    <button className="btn btn-primary" onClick={() => setAddCamera(cameraState)}>Add camera</button>
   )
 }
 
