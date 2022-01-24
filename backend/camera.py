@@ -7,7 +7,7 @@ class Camera():
     """
     """
 
-    def __init__(self, resolution=(1280, 720)):
+    def __init__(self):
         """
         """
 
@@ -19,7 +19,7 @@ class Camera():
             "ov5647": "V1 module",
             "imx219": "V2 module"
         }
-        self.camera = PiCamera(resolution=resolution,framerate=30)
+        self.camera = PiCamera()
         self.camera.rotation = 180
 
     def __del__(self):
@@ -73,7 +73,7 @@ class Camera():
         """
 
         stream = BytesIO()
-        for _ in self.camera.capture_continuous(stream, "jpeg", use_video_port=True, quality=20):
+        for _ in self.camera.capture_continuous(stream, "jpeg", use_video_port=True, quality=10):
             stream.seek(0)
             yield stream.read()
             stream.truncate()
