@@ -136,13 +136,12 @@ function CameraStream() {
   );
 }
 
-function CameraModules() {
+function CameraModules({ setCameraState }) {
   const { data, error } = useFetchGet(host + host_camera_config)
-  const [module, setModule] = useState(null)
 
   const [handleChange] = useState((e) => {
     return (e) => {
-      setModule(e.value);
+      setCameraState(cameraState => ({ ...cameraState, module: e.value }))
     };
   });
 
@@ -153,18 +152,16 @@ function CameraModules() {
         { label: item, value: item }
       ))
       } onChange={handleChange} />
-      {module}
     </div>
   )
 }
 
-function CameraModes() {
+function CameraModes({ setCameraState }) {
   const { data, error } = useFetchGet(host + host_camera_config)
-  const [mode, setMode] = useState(null)
 
   const [handleChange] = useState((e) => {
     return (e) => {
-      setMode(e.value);
+      setCameraState(cameraState => ({ ...cameraState, mode: e.value }))
     };
   });
 
@@ -175,16 +172,15 @@ function CameraModes() {
         data.modes.map(item => (
           {
             value: item,
-            label: item[0][0] + "x" + item[0][1] + ", FPS: " + item[1][0] + ":" + item[1][1] + ", FoV: " + item[4]
+            label: item[1][0] + "x" + item[1][1] + ", FoV: " + item[5]
           }
         ))
       } onChange={handleChange} />
-      {mode}
     </div>
   )
 }
 
-function CameraSave() {
+function CameraSave({ setCameraState }) {
   const [addCamera, setAddCamera] = useState()
 
   useEffect(() => {
@@ -205,23 +201,26 @@ function CameraSave() {
   )
 }
 
-function CameraSettings() {
+function CameraSettings({ setCameraState }) {
   return (
     <React.Fragment>
       <CameraSettingsPane>
         <Label>Camera settings</Label>
-        <CameraModules />
-        <CameraModes />
+        <CameraModules setCameraState={setCameraState} />
+        <CameraModes setCameraState={setCameraState} />
       </CameraSettingsPane>
     </React.Fragment>
   )
 }
 
 function AddCamera() {
+  const [cameraState, setCameraState] = useState([])
+
   return (
     <Section>
-      <CameraSettings />
-      <CameraSave />
+      <CameraSettings setCameraState={setCameraState} />
+      <CameraSave setCameraState={setCameraState} />
+      {console.log(cameraState)}
     </Section>
   );
 }
