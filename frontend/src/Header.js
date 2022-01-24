@@ -28,13 +28,13 @@ const Li = styled.li`
 
 const ALink = styled(NavLink)`
   text-decoration: none;
-  color: #000;
+  color: palevioletred;
 
   padding: 1em;
   display: block;
 
   &:hover {
-    color: palevioletred;
+    color: black;
   }
 
   &:visited {
@@ -42,7 +42,7 @@ const ALink = styled(NavLink)`
   }
 
   &.active {
-    color: palevioletred;
+    color: black;
   }
 `;
 
