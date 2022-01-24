@@ -180,7 +180,7 @@ function CameraModes({ setCameraState }) {
   )
 }
 
-function CameraSave({ setCameraState }) {
+function CameraSave({ cameraState }) {
   const [addCamera, setAddCamera] = useState()
 
   useEffect(() => {
@@ -188,7 +188,7 @@ function CameraSave({ setCameraState }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(
-        { camera: 'test' }
+        addCamera
       )
     };
     fetch(host + host_save_cameras, requestOptions)
@@ -197,7 +197,7 @@ function CameraSave({ setCameraState }) {
   }, [addCamera]);
 
   return (
-    <button onClick={() => setAddCamera()}>Add camera</button>
+    <button onClick={() => setAddCamera(cameraState)}>Add camera</button>
   )
 }
 
@@ -219,7 +219,7 @@ function AddCamera() {
   return (
     <Section>
       <CameraSettings setCameraState={setCameraState} />
-      <CameraSave setCameraState={setCameraState} />
+      <CameraSave cameraState={cameraState} />
       {console.log(cameraState)}
     </Section>
   );
