@@ -2,6 +2,7 @@ import sys
 import base64
 import asyncio
 from io import BytesIO
+from json import dumps, loads
 from sanic import Sanic
 from sanic import response
 from sanic_cors import CORS, cross_origin
@@ -41,7 +42,7 @@ async def camera(request):
     """
 
     with open(CAMERA_LIST_FILE, "r") as file:
-        response = json(file.read())
+        response = json(loads(file.read()))
         return response
 
 
@@ -50,8 +51,22 @@ async def camera(request):
     """
     """
 
-    with open(CAMERA_LIST_FILE, "a") as file:
-        file.write(str(request.json))
+    client_data = request.json
+
+    data = []
+    with open(CAMERA_LIST_FILE, "r") as file:
+        try:
+            data.append(loads(file.read()))
+            print(data)
+        except:
+            data = []
+
+    with open(CAMERA_LIST_FILE, "w") as file:
+        if client_data is not None:
+            data.append(client_data)
+            data = dumps(data)
+            file.write(data)
+
     return json({"1": 2})
 
 
