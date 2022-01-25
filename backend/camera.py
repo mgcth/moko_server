@@ -7,20 +7,32 @@ class Camera():
     """
     """
 
-    def __init__(self):
+    def __init__(
+        self,
+        name="A camera has no name",
+        resolution_id=1,
+        rotation=180,
+        quality=10
+    ):
         """
         """
 
         #self.module = None
         #self.mode = None
 
+        self.name = name
         self.settings = CameraSettings()
         self.camera_map = {
             "ov5647": "V1 module",
             "imx219": "V2 module"
         }
+
         self.camera = PiCamera()
-        self.camera.rotation = 180
+
+        resolution = self.settings.modes[self._module()[0]][resolution_id-1][1]
+        self.camera.resolution = resolution
+        self.camera.rotation = rotation
+        self.quality = quality
 
     def __del__(self):
         """
@@ -49,15 +61,21 @@ class Camera():
 
         self.camera.close()
 
+    def _module(self):
+        """
+        """
+
+        module = self.camera.revision
+        self._model = self.settings.module.get(module, "none")
+
+        return self._model
+
     @property
     def module(self):
         """
         """
 
-        module = self.camera.revision
-        model = self.settings.module.get(module, "none")
-
-        return model
+        return self._module()
 
     @property
     def modes(self):
@@ -73,7 +91,7 @@ class Camera():
         """
 
         stream = BytesIO()
-        for _ in self.camera.capture_continuous(stream, "jpeg", use_video_port=True, quality=10):
+        for _ in self.camera.capture_continuous(stream, "jpeg", use_video_port=True, quality=self.quality):
             stream.seek(0)
             yield stream.read()
             stream.truncate()

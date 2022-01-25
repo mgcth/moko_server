@@ -2,7 +2,7 @@ import sys
 import base64
 import asyncio
 from io import BytesIO
-from json import dumps, loads
+from json import dumps, dump, loads
 from sanic import Sanic
 from sanic import response
 from sanic_cors import CORS, cross_origin
@@ -58,17 +58,16 @@ async def camera(request):
     data = {}
     with open(CAMERA_LIST_FILE, "r") as file:
         try:
-            f = loads(file.read())
-            data[f["name"]] = f
+            data = loads(file.read())
             print(data)
-        except:
+        except Exception as e:
+            print(e)
             data = {}
 
-    with open(CAMERA_LIST_FILE, "w") as file:
+    with open(CAMERA_LIST_FILE, "w", encoding="utf-8") as file:
         if client_data is not None:
             data[client_data["name"]] = client_data
-            data = dumps(data)
-            file.write(data)
+            dump(data, file)
 
     return json({"OK": True})
 
@@ -78,7 +77,16 @@ async def stream(request, ws):
     """
     """
 
-    camera = Camera()
+    camera_name = await ws.recv()
+
+    data = {}
+    with open(CAMERA_LIST_FILE, "r") as file:
+        f = loads(file.read())
+        data = f[camera_name]
+
+    resolution_id = data["mode"][0]
+
+    camera = Camera(camera_name, resolution_id)
     try:
         while True:
             await asyncio.sleep(0.01)
