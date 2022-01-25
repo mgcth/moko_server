@@ -177,6 +177,48 @@ function CameraModes({ setCameraState }) {
   )
 }
 
+function CameraQuality({ setCameraState }) {
+  const { data, error } = useFetchGet(host + host_camera_config)
+
+  const [handleChange] = useState((e) => {
+    return (e) => {
+      setCameraState(cameraState => ({ ...cameraState, quality: e.target.value }))
+    };
+  });
+
+  return (
+    <div>
+      <Label>Quality</Label>
+      <input
+        type="text"
+        className="form-control"
+        placeholder="JPEG quality, value between 1-100"
+        onChange={handleChange}
+      >
+      </input>
+    </div>
+  )
+}
+
+function CameraRotation({ setCameraState }) {
+  const { data, error } = useFetchGet(host + host_camera_config)
+
+  const [handleChange] = useState((e) => {
+    return (e) => {
+      setCameraState(cameraState => ({ ...cameraState, rotation: e.value }))
+    };
+  });
+
+  return (
+    <div>
+      <Label>Rotation</Label>
+      <Select options={
+        [{ label: 0, value: 0 }, { label: 90, value: 90 }, { label: 180, value: 180 }, { label: 270, value: 270 }]
+      } onChange={handleChange} />
+    </div>
+  )
+}
+
 function CameraSaveFolder({ setCameraState }) {
   const { data, error } = useFetchGet(host + host_camera_config)
 
@@ -229,6 +271,8 @@ function CameraSettings({ setCameraState }) {
         <CameraName setCameraState={setCameraState} />
         <CameraModules setCameraState={setCameraState} />
         <CameraModes setCameraState={setCameraState} />
+        <CameraQuality setCameraState={setCameraState} />
+        <CameraRotation setCameraState={setCameraState} />
         <CameraSaveFolder setCameraState={setCameraState} />
       </CameraSettingsPane>
     </React.Fragment>
