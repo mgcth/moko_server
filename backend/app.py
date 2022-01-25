@@ -35,7 +35,7 @@ async def camera(request):
             "modes": camera.modes,
             "save_folder": None
             })
-        return await response
+        return response
 
 
 @app.route("/read-cameras")
