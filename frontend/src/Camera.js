@@ -207,11 +207,11 @@ function CameraSave({ cameraState }) {
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(
-        addCamera
-      )
+      body: JSON.stringify(addCamera)
     };
-    fetch(host + host_save_cameras, requestOptions)
+
+    console.log(addCamera)
+    addCamera && fetch(host + host_save_cameras, requestOptions)
     // .then(response => response.json())
     // .then(data => setPostId(data.id));
   }, [addCamera]);
