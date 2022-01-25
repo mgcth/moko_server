@@ -30,12 +30,12 @@ async def camera(request):
 
     with Camera() as camera:
         response = json({
-            "name": None
+            "name": None,
             "module": camera.module,
             "modes": camera.modes,
             "save_folder": None
             })
-        return response
+        return await response
 
 
 @app.route("/read-cameras")
