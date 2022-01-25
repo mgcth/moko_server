@@ -55,21 +55,22 @@ async def camera(request):
 
     client_data = request.json
 
-    data = []
+    data = {}
     with open(CAMERA_LIST_FILE, "r") as file:
         try:
-            data.append(loads(file.read()))
+            f = loads(file.read())
+            data[f["name"]] = f
             print(data)
         except:
-            data = []
+            data = {}
 
     with open(CAMERA_LIST_FILE, "w") as file:
         if client_data is not None:
-            data.append(client_data)
+            data[client_data["name"]] = client_data
             data = dumps(data)
             file.write(data)
 
-    return json({"1": 2})
+    return json({"OK": True})
 
 
 @app.websocket("/stream")
