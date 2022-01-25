@@ -44,6 +44,12 @@ const CameraLink = styled(Link)`
   &:hover {
     color: #000;
   }
+
+  &:focus {
+    background: papayawhip;
+    border-color: papayawhip;
+    box-shadow: 0 0 0 .2rem rgba(219, 112, 147, .5);
+  }
 `;
 
 const Img = styled.img`

@@ -242,6 +242,18 @@ function CameraSaveFolder({ setCameraState }) {
   )
 }
 
+const AddButton = styled.button`
+  color: palevioletred;
+  background: papayawhip;
+  border-color: papayawhip;
+
+  &:focus {
+    background: papayawhip;
+    border-color: papayawhip;
+    box-shadow: 0 0 0 .2rem rgba(219, 112, 147, .5);
+  }
+`
+
 function CameraSave({ cameraState }) {
   const [addCamera, setAddCamera] = useState()
 
@@ -259,7 +271,7 @@ function CameraSave({ cameraState }) {
   }, [addCamera]);
 
   return (
-    <button className="btn btn-dark" onClick={() => setAddCamera(cameraState)}>Add camera</button>
+    <AddButton className="btn" onClick={() => setAddCamera(cameraState)}>Add camera</AddButton>
   )
 }
 
