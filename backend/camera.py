@@ -11,7 +11,7 @@ class Camera():
         self,
         name="A camera has no name",
         resolution_id=1,
-        rotation=180,
+        rotation=0,
         quality=10
     ):
         """

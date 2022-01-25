@@ -83,8 +83,10 @@ async def stream(request, ws):
         data = f[camera_name]
 
     resolution_id = data["mode"][0]
+    rotation = data["rotation"]
+    quality = data["quality"]
 
-    camera = Camera(camera_name, resolution_id)
+    camera = Camera(camera_name, resolution_id, rotation, quality)
     try:
         while True:
             await asyncio.sleep(0.01)
