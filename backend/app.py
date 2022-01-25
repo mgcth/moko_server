@@ -72,14 +72,6 @@ async def camera(request):
     return json({"1": 2})
 
 
-@app.route("/")
-async def index(request):
-    """
-    """
-
-    return response.html('''Hi''')
-
-
 @app.websocket("/stream")
 async def stream(request, ws):
     """
