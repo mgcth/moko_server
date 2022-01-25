@@ -64,8 +64,8 @@ function Home() {
     <Section className="Home">
       {console.log(data)}
       <Ul>
-        {data.length !== 0 && data.map(camera => {
-          return <Li key={camera.module}><CameraLink to="camera-x">{camera.module}</CameraLink></Li>
+        {Object.keys(data).length !== 0 && Object.keys(data).map((key, index) => {
+          return <Li key={key}><CameraLink to="camera-x">{key}</CameraLink></Li>
         })}
         <Li>
           <CameraLink to="add-camera">

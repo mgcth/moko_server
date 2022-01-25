@@ -102,8 +102,31 @@ function CameraStream() {
   }, [])
 
   return (
-    <Img src={img} alt="stream" />
+    <Img className="img-fluid" src={img} alt="stream" />
   );
+}
+
+function CameraName({ setCameraState }) {
+  const { data, error } = useFetchGet(host + host_camera_config)
+
+  const [handleChange] = useState((e) => {
+    return (e) => {
+      setCameraState(cameraState => ({ ...cameraState, name: e.target.value }))
+    };
+  });
+
+  return (
+    <div>
+      <Label>Name</Label>
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Type unique camera name..."
+        onChange={handleChange}
+      >
+      </input>
+    </div>
+  )
 }
 
 function CameraModules({ setCameraState }) {
@@ -150,6 +173,29 @@ function CameraModes({ setCameraState }) {
   )
 }
 
+function CameraSaveFolder({ setCameraState }) {
+  const { data, error } = useFetchGet(host + host_camera_config)
+
+  const [handleChange] = useState((e) => {
+    return (e) => {
+      setCameraState(cameraState => ({ ...cameraState, save_folder: e.target.value }))
+    };
+  });
+
+  return (
+    <div>
+      <Label>Save folder</Label>
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Type save folder path (absolute)..."
+        onChange={handleChange}
+      >
+      </input>
+    </div>
+  )
+}
+
 function CameraSave({ cameraState }) {
   const [addCamera, setAddCamera] = useState()
 
@@ -167,7 +213,7 @@ function CameraSave({ cameraState }) {
   }, [addCamera]);
 
   return (
-    <button className="btn btn-primary" onClick={() => setAddCamera(cameraState)}>Add camera</button>
+    <button className="btn btn-dark" onClick={() => setAddCamera(cameraState)}>Add camera</button>
   )
 }
 
@@ -176,8 +222,10 @@ function CameraSettings({ setCameraState }) {
     <React.Fragment>
       <CameraSettingsPane>
         <Label>Camera settings</Label>
+        <CameraName setCameraState={setCameraState} />
         <CameraModules setCameraState={setCameraState} />
         <CameraModes setCameraState={setCameraState} />
+        <CameraSaveFolder setCameraState={setCameraState} />
       </CameraSettingsPane>
     </React.Fragment>
   )
