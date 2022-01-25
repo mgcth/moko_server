@@ -52,8 +52,6 @@ const Img = styled.img`
   max-height: 720px; */
 `
 
-const cameraList = ["Camera 1"]
-
 const host = "http://moko:5000"
 const host_read_cameras = "/read-cameras"
 
@@ -62,10 +60,9 @@ function Home() {
 
   return (
     <Section className="Home">
-      {console.log(data)}
       <Ul>
         {Object.keys(data).length !== 0 && Object.keys(data).map((key, index) => {
-          return <Li key={key}><CameraLink to="camera-x">{key}</CameraLink></Li>
+          return <Li key={key}><CameraLink to="camera-x" state={key}>{key}</CameraLink></Li>
         })}
         <Li>
           <CameraLink to="add-camera">

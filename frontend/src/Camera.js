@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import React, { useState, useRef, useEffect } from "react";
+import { useLocation } from "react-router";
 import { Link, renderMatches } from 'react-router-dom';
 import styled from 'styled-components';
 import Select from 'react-select';
@@ -74,13 +75,16 @@ const Label = styled.label`
 
 
 
-function CameraStream() {
+function CameraStream({ cameraName }) {
   const wsRef = useRef(null);
   const [img, setImg] = useState();
 
   useEffect(() => {
     if (!wsRef.current) {
       wsRef.current = new WebSocket(host_ws + host_stream);
+      wsRef.current.onopen = () => {
+        wsRef.current.send(cameraName);
+      }
     }
 
     if (wsRef.current) {
@@ -92,7 +96,7 @@ function CameraStream() {
           setImg(null)
           console.log(err);
         }
-      };
+      }
     }
 
     return () => {
@@ -238,16 +242,17 @@ function AddCamera() {
     <Section>
       <CameraSettings setCameraState={setCameraState} />
       <CameraSave cameraState={cameraState} />
-      {console.log(cameraState)}
     </Section>
   );
 }
 
-function Camera() {
+function Camera(props) {
+  const cameraName = useLocation().state
+
   return (
-    <Section className="camera-stream">
-      <CameraStream />
-    </Section>
+    < Section className="camera-stream" >
+      <CameraStream cameraName={cameraName} />
+    </Section >
   );
 }
 
