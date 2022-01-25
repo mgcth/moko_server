@@ -30,8 +30,10 @@ async def camera(request):
 
     with Camera() as camera:
         response = json({
+            "name": None
             "module": camera.module,
             "modes": camera.modes,
+            "save_folder": None
             })
         return response
 
@@ -88,7 +90,7 @@ async def stream(request, ws):
         while True:
             await asyncio.sleep(0.01)
             frame = next(camera.frames())
-            print(sys.getsizeof(frame))
+            #print(sys.getsizeof(frame))
             await ws.send(
                f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
             )
