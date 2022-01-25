@@ -2,7 +2,7 @@ import sys
 import base64
 import asyncio
 from io import BytesIO
-from json import dumps, dump, loads
+from json import dumps, loads
 from sanic import Sanic
 from sanic import response
 from sanic_cors import CORS, cross_origin
@@ -55,21 +55,19 @@ async def camera(request):
 
     client_data = request.json
 
-    data = {}
     with open(CAMERA_LIST_FILE, "r") as file:
         try:
             data = loads(file.read())
-            print(data)
-        except Exception as e:
-            print(e)
+        except:
             data = {}
 
     with open(CAMERA_LIST_FILE, "w", encoding="utf-8") as file:
         if client_data is not None:
             data[client_data["name"]] = client_data
-            dump(data, file)
+        
+        file.write(dumps(data))
 
-    return json({"OK": True})
+    return json({"status": 200})
 
 
 @app.websocket("/stream")
