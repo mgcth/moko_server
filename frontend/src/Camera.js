@@ -138,14 +138,14 @@ function CameraModels({ setCameraState }) {
 
   const [handleChange] = useState((e) => {
     return (e) => {
-      setCameraState(cameraState => ({ ...cameraState, module: e.value }))
+      setCameraState(cameraState => ({ ...cameraState, model: e.value }))
     };
   });
 
   return (
     <div>
-      <Label>Module</Label>
-      <Select options={"module" in data && data.module.map(item => (
+      <Label>Model</Label>
+      <Select options={"model" in data && data.model.map(item => (
         { label: item, value: item }
       ))
       } onChange={handleChange} />
@@ -252,11 +252,18 @@ const AddButton = styled.button`
   color: #010b10;
   background: #f0f0f0;
   border-color: #f0f0f0;
+  padding: 1em;
+
+  &:hover {
+    color: #fafafa;
+    background: #010b10;
+  }
 
   &:focus {
-    background: #f0f0f0;
-    border-color: #f0f0f0;
-    box-shadow: 0 0 0 .2rem rgba(1, 11, 16, .5);
+    color: #fafafa;
+    background: #010b10;
+    border: none;
+    box-shadow: none;
   }
 `
 

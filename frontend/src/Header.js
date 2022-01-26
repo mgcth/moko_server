@@ -34,22 +34,23 @@ const ALink = styled(NavLink)`
   display: block;
 
   &:hover {
-    color: black;
+    color: #fafafa;
+    background: #010b10;
   }
 
   &:visited {
-    color: #000;
+    color: #010b10;
   }
 
   &.active {
-    color: black;
+    color: #fafafa;
+    background: #010b10;
   }
 `;
 
 const ADiv = styled.div`
   text-decoration: none;
   color: #000;
-
   padding: 1em;
   display: block;
 `;
