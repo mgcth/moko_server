@@ -182,7 +182,11 @@ function CameraQuality({ setCameraState }) {
 
   const [handleChange] = useState((e) => {
     return (e) => {
-      setCameraState(cameraState => ({ ...cameraState, quality: e.target.value }))
+      let value = 10
+      if (1 <= e.target.value <= 100) {
+        value = e.target.value
+      }
+      setCameraState(cameraState => ({ ...cameraState, quality: parseInt(value, 10) }))
     };
   });
 
@@ -190,9 +194,11 @@ function CameraQuality({ setCameraState }) {
     <div>
       <Label>Quality</Label>
       <input
-        type="text"
+        type="number"
         className="form-control"
-        placeholder="JPEG quality, value between 1-100"
+        placeholder="JPEG quality, default 10, value between 1-100"
+        min={1}
+        max={100}
         onChange={handleChange}
       >
       </input>
