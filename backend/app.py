@@ -43,9 +43,13 @@ async def camera(request):
     """
     """
 
-    with open(CAMERA_LIST_FILE, "r") as file:
-        response = json(loads(file.read()))
-        return response
+    
+    with open(CAMERA_LIST_FILE, "r") as file:  
+        try:
+            response = json(loads(file.read()))
+            return response
+        except:
+            return json({})
 
 
 @app.route("/save-camera", methods=["POST"])
@@ -67,7 +71,7 @@ async def camera(request):
         
         file.write(dumps(data))
 
-    return json({"status": 200})
+    return json({})
 
 
 @app.websocket("/stream")
