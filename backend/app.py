@@ -26,21 +26,23 @@ CAMERA_LIST_FILE = "../../camera_list.json"
 @app.route("/camera-config")
 async def camera(request):
     """
+    Get camera configs endpoint.
     """
 
     with Camera() as camera:
         response = json({
             "name": None,
-            "model": camera.model,
-            "modes": camera.modes,
+            "model": [camera.model],  # send an array, should support several types
+            "modes": camera.modes,  # this should be set by camera.model
             "save_folder": None
             })
         return response
 
 
 @app.route("/read-cameras")
-async def camera(request):
+async def read_camera(request):
     """
+    Read available cameras endpoint.
     """
 
     
@@ -53,8 +55,9 @@ async def camera(request):
 
 
 @app.route("/save-camera", methods=["POST"])
-async def camera(request):
+async def save_camera(request):
     """
+    Save camera (and write to cameras file) endpoint.
     """
 
     client_data = request.json
@@ -77,6 +80,7 @@ async def camera(request):
 @app.websocket("/stream")
 async def stream(request, ws):
     """
+    Websocket camera stream endpoint.
     """
 
     camera_name = await ws.recv()
