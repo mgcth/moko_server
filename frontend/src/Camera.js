@@ -133,7 +133,7 @@ function CameraName({ setCameraState }) {
   )
 }
 
-function CameraModules({ setCameraState }) {
+function CameraModels({ setCameraState }) {
   const { data, error } = useFetchGet(host + host_camera_config)
 
   const [handleChange] = useState((e) => {
@@ -287,7 +287,7 @@ function CameraSettings({ setCameraState }) {
       <CameraSettingsPane>
         <Label>Camera settings</Label>
         <CameraName setCameraState={setCameraState} />
-        <CameraModules setCameraState={setCameraState} />
+        <CameraModels setCameraState={setCameraState} />
         <CameraModes setCameraState={setCameraState} />
         <CameraQuality setCameraState={setCameraState} />
         <CameraRotation setCameraState={setCameraState} />
