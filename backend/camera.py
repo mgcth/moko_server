@@ -5,6 +5,7 @@ from camera_settings import CameraSettings
 
 class Camera():
     """
+    Camera class, for now only supporting the Raspberry Pi Official cameras V1 and V2.
     """
 
     def __init__(
@@ -15,79 +16,85 @@ class Camera():
         quality=10
     ):
         """
-        """
+        Initialise the camera with a name, resolution (mode), rotation and stream quality settings.
 
-        #self.module = None
-        #self.mode = None
+        Input:
+            name: camera name
+            resolution_id: camera mode identifier
+            rotation: camera rotation
+            quality: stream feed quality
+        """
 
         self.name = name
         self.settings = CameraSettings()
-        self.camera_map = {
-            "ov5647": "V1 module",
-            "imx219": "V2 module"
-        }
-
         self.camera = PiCamera()
 
-        resolution = self.settings.modes[self._module()[0]][resolution_id-1][1]
-        self.camera.resolution = resolution
         self.camera.rotation = rotation
         self.quality = quality
 
+        model = self._model()
+        resolution = self.settings.modes[model][resolution_id][1]
+        self.camera.resolution = resolution
+        
     def __del__(self):
         """
+        Delete camera object, close camera.
         """
 
-        #try:
         self.camera.close()
-        #except:
-        #    pass  # avoid and fix, just testing
 
     def __enter__(self):
         """
+        Allow context manager.
         """
 
         return self
 
     def __exit__(self, type, value, traceback):
         """
+        Exit camera object and close camera.
         """
 
         self.close()
 
     def close(self):
         """
+        Close camera function.
         """
 
         self.camera.close()
 
-    def _module(self):
+    def _model(self):
         """
+        Get the connected model from module.
         """
 
         module = self.camera.revision
-        self._model = self.settings.module.get(module, "none")
+        model = self.settings.module.get(module, "none")
 
-        return self._model
+        return model
 
     @property
-    def module(self):
+    def model(self):
         """
+        Get camera model.
         """
 
-        return self._module()
+        return self._model()
 
     @property
     def modes(self):
         """
+        Get available camera modes.
         """
 
-        modes = self.settings.modes.get(self.module[0], "none")
+        modes = self.settings.modes.get(self._model(), "none")
 
         return modes
 
-    def frames(self):
+    def next_frame(self):
         """
+        Get next frame in feed.
         """
 
         stream = BytesIO()
