@@ -2,12 +2,12 @@ import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Header = styled.header`
-  background: papayawhip;
+  background: #f0f0f0;
   position: fixed;
   top: 20px;
   left: 20px;
 
-  background: papayawhip;
+  background: #f0f0f0;
   text-transform: capitalize;
 `;
 
@@ -28,7 +28,7 @@ const Li = styled.li`
 
 const ALink = styled(NavLink)`
   text-decoration: none;
-  color: palevioletred;
+  color: #010b10;
 
   padding: 1em;
   display: block;

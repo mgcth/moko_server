@@ -38,15 +38,15 @@ const Section = styled.section`
 const CameraLink = styled(Link)`
   font-size: 3em;
   text-align: center;
-  color: palevioletred;
-  background: papayawhip;
+  color: #010b10;
+  background: #f0f0f0;
   margin: 0;
   padding: 1em;
   display: block;
   text-decoration: none;
 
   &:visited {
-    color: palevioletred;
+    color: #010b10;
   }
 
   &:hover {
@@ -61,7 +61,7 @@ const Img = styled.img`
 `
 
 const CameraSettingsPane = styled.div`
-  background: papayawhip;
+  background: #f0f0f0;
   margin: 1em 0;
   padding: 1em;
   text-transform: capitalize;
@@ -249,13 +249,13 @@ function CameraSaveFolder({ setCameraState }) {
 }
 
 const AddButton = styled.button`
-  color: palevioletred;
-  background: papayawhip;
-  border-color: papayawhip;
+  color: #010b10;
+  background: #f0f0f0;
+  border-color: #f0f0f0;
 
   &:focus {
-    background: papayawhip;
-    border-color: papayawhip;
+    background: #f0f0f0;
+    border-color: #f0f0f0;
     box-shadow: 0 0 0 .2rem rgba(219, 112, 147, .5);
   }
 `

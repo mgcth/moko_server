@@ -16,7 +16,7 @@ const Li = styled.li`
 `;
 
 const Title = styled.h1`
-  color: palevioletred;
+  color: #010b10;
   padding: 0;
 `;
 
