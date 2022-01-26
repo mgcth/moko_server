@@ -256,7 +256,7 @@ const AddButton = styled.button`
   &:focus {
     background: #f0f0f0;
     border-color: #f0f0f0;
-    box-shadow: 0 0 0 .2rem rgba(219, 112, 147, .5);
+    box-shadow: 0 0 0 .2rem rgba(1, 11, 16, .5);
   }
 `
 
