@@ -96,7 +96,11 @@ function Home() {
           return (
             <Li key={key}>
               <ParentDiv>
-                <RemoveLink onClick={() => setRemove(key)}>x</RemoveLink>
+                <RemoveLink onClick={() => {
+                  delete data[key]  // this should send a DELETE request to the server
+                  setRemove(key)
+                }
+                }>x</RemoveLink>
                 <CameraLink to="camera" state={key}>{key}</CameraLink>
               </ParentDiv>
             </Li>
