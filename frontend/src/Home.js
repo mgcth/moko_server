@@ -27,6 +27,33 @@ const Section = styled.section`
 `;
 
 
+const ParentDiv = styled.div`
+  position: relative;
+`
+const RemoveLink = styled(Link)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  text-decoration: none;
+  padding: 0.15em 0.5em;
+  color: #010b10;
+  background: #f0f0f0;
+
+  &:visited {
+    color: #010b10;
+  }
+
+  &:hover {
+    color: #fafafa;
+    background: #010b10;
+  }
+
+  &:focus {
+    color: #fafafa;
+    background: #010b10;
+  }
+`
+
 const CameraLink = styled(Link)`
   font-size: 3em;
   text-align: center;
@@ -68,7 +95,14 @@ function Home() {
     <Section className="Home">
       <Ul>
         {Object.keys(data).length !== 0 && Object.keys(data).map((key, index) => {
-          return <Li key={key}><CameraLink to="camera-x" state={key}>{key}</CameraLink></Li>
+          return (
+            <Li key={key}>
+              <ParentDiv>
+                <RemoveLink to="remove-x">x</RemoveLink>
+                <CameraLink to="camera-x" state={key}>{key}</CameraLink>
+              </ParentDiv>
+            </Li>
+          )
         })}
         <Li>
           <CameraLink to="add-camera">
