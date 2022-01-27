@@ -30,7 +30,7 @@ const Section = styled.section`
 const ParentDiv = styled.div`
   position: relative;
 `
-const RemoveLink = styled(Link)`
+const RemoveLink = styled.button`
   position: absolute;
   top: 0;
   left: 0;
@@ -38,17 +38,13 @@ const RemoveLink = styled(Link)`
   padding: 0.15em 0.5em;
   color: #010b10;
   background: #f0f0f0;
+  border: none;
 
   &:visited {
     color: #010b10;
   }
 
   &:hover {
-    color: #fafafa;
-    background: #010b10;
-  }
-
-  &:focus {
     color: #fafafa;
     background: #010b10;
   }
@@ -90,20 +86,31 @@ const host_read_cameras = "/read-cameras"
 
 function Home() {
   const { data, error } = useFetchGet(host + host_read_cameras)
+  const [remove, setRemove] = useState(false)
+  const [cameraList, setCameraList] = useState()
+
+  useEffect(() => {
+    setCameraList(() => {
+      return (
+        Object.keys(data).length !== 0 && Object.keys(data).map((key, index) => {
+          return (
+            <Li key={key}>
+              <ParentDiv>
+                <RemoveLink onClick={() => setRemove(key)}>x</RemoveLink>
+                <CameraLink to="camera" state={key}>{key}</CameraLink>
+              </ParentDiv>
+            </Li>
+          )
+        })
+      )
+    }
+    )
+  }, [remove, data])
 
   return (
     <Section className="Home">
       <Ul>
-        {Object.keys(data).length !== 0 && Object.keys(data).map((key, index) => {
-          return (
-            <Li key={key}>
-              <ParentDiv>
-                <RemoveLink to="remove-x">x</RemoveLink>
-                <CameraLink to="camera-x" state={key}>{key}</CameraLink>
-              </ParentDiv>
-            </Li>
-          )
-        })}
+        {cameraList}
         <Li>
           <CameraLink to="add-camera">
             +
@@ -111,7 +118,7 @@ function Home() {
         </Li>
       </Ul>
     </Section >
-  );
+  )
 }
 
 export default Home;

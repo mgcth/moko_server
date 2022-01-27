@@ -17,7 +17,7 @@ function App() {
         <Routes>
           <Route path="/*" element={<Home />} />
           <Route path="settings/*" element={<Settings />} />
-          <Route path="camera-x" element={<Camera />} />
+          <Route path="camera" element={<Camera />} />
           <Route path="add-camera" element={<AddCamera />} />
         </Routes>
         <AppFooter />
