@@ -82,10 +82,11 @@ const Img = styled.img`
 `
 
 const host = "http://moko:5000"
-const host_read_cameras = "/read-cameras"
+const host_read_camera = "/read-camera"
+const host_delete_camera = "/delete-camera"
 
 function Home() {
-  const { data, error } = useFetchGet(host + host_read_cameras)
+  const { data, error } = useFetchGet(host + host_read_camera)
   const [remove, setRemove] = useState(false)
   const [cameraList, setCameraList] = useState()
 
@@ -97,7 +98,14 @@ function Home() {
             <Li key={key}>
               <ParentDiv>
                 <RemoveLink onClick={() => {
-                  delete data[key]  // this should send a DELETE request to the server
+                  const deleteOptions = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(key)
+                  };
+
+                  fetch(host + host_delete_camera, deleteOptions)
+
                   setRemove(key)
                 }
                 }>x</RemoveLink>
