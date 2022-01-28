@@ -39,7 +39,7 @@ async def camera(request):
         return response
 
 
-@app.route("/read-cameras")
+@app.route("/read-camera")
 async def read_camera(request):
     """
     Read available cameras endpoint.
@@ -73,6 +73,28 @@ async def save_camera(request):
             data[client_data["name"]] = client_data
         
         file.write(dumps(data))
+
+    return json({})
+
+@app.route("/delete-camera", methods=["POST"])
+async def save_camera(request):
+    """
+    Delete camera (and write to cameras file) endpoint.
+    """
+
+    client_data = request.json
+
+    with open(CAMERA_LIST_FILE, "r") as file:
+        try:
+            data = loads(file.read())
+        except:
+            data = {}
+
+    with open(CAMERA_LIST_FILE, "w", encoding="utf-8") as file:
+        if client_data is not None and data != {}:
+            data.pop(client_data)
+        
+            file.write(dumps(data))
 
     return json({})
 
