@@ -86,9 +86,9 @@ const host_read_camera = "/read-camera"
 const host_delete_camera = "/delete-camera"
 
 function Home() {
-  const { data, error } = useFetchGet(host + host_read_camera)
   const [remove, setRemove] = useState(false)
   const [cameraList, setCameraList] = useState()
+  const { data, error } = useFetchGet(host + host_read_camera)
 
   useEffect(() => {
     setCameraList(() => {
@@ -98,6 +98,9 @@ function Home() {
             <Li key={key}>
               <ParentDiv>
                 <RemoveLink onClick={() => {
+                  setRemove(key)
+                  delete data[key]
+
                   const deleteOptions = {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -105,8 +108,6 @@ function Home() {
                   };
 
                   fetch(host + host_delete_camera, deleteOptions)
-
-                  setRemove(key)
                 }
                 }>x</RemoveLink>
                 <CameraLink to="camera" state={key}>{key}</CameraLink>
