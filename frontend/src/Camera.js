@@ -12,7 +12,7 @@ const host_ws = "ws://moko:5000"
 const host_stream = "/stream"
 const host_camera_config = "/camera-config"
 const host_read_cameras = "/read-cameras"
-const host_save_cameras = "/save-camera"
+const host_save_camera = "/save-camera"
 
 
 const Ul = styled.ul`
@@ -278,7 +278,7 @@ function CameraSave({ cameraState }) {
     };
 
     console.log(addCamera)
-    addCamera && fetch(host + host_save_cameras, requestOptions)
+    addCamera && fetch(host + host_save_camera, requestOptions)
     // .then(response => response.json())
     // .then(data => setPostId(data.id));
   }, [addCamera]);
