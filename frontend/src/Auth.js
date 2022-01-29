@@ -80,7 +80,7 @@ function AddServer({ login, setServers }) {
           }
         };
 
-        console.log(requestVerify)
+        // console.log(requestVerify)
         fetch(host + "/auth/verify", requestVerify)
 
         setServers(servers => ({ ...servers, [host]: { token: data["access_token"] } }))
