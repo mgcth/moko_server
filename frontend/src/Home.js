@@ -3,6 +3,7 @@ import { Link, renderMatches } from 'react-router-dom';
 import styled from 'styled-components';
 import { Camera, AddCamera } from './Camera.js'
 import { useFetchGet } from "./useFetchGet.js"
+import { host, host_read_camera, host_delete_camera } from "./Hosts.js"
 
 const Nav = styled.nav`
 `;
@@ -80,10 +81,6 @@ const Img = styled.img`
   width: 100%;
   max-height: 720px; */
 `
-
-const host = "http://moko:5000"
-const host_read_camera = "/read-camera"
-const host_delete_camera = "/delete-camera"
 
 function Home() {
   const [remove, setRemove] = useState(false)

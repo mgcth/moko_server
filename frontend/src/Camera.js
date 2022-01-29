@@ -5,14 +5,14 @@ import { Link, renderMatches } from 'react-router-dom';
 import styled from 'styled-components';
 import Select from 'react-select';
 import { useFetchGet } from "./useFetchGet.js"
-
-
-const host = "http://moko:5000"
-const host_ws = "ws://moko:5000"
-const host_stream = "/stream"
-const host_camera_config = "/camera-config"
-const host_read_cameras = "/read-cameras"
-const host_save_camera = "/save-camera"
+import {
+  host,
+  host_ws,
+  host_stream,
+  host_camera_config,
+  host_read_cameras,
+  host_save_camera
+} from "./Hosts.js"
 
 
 const Ul = styled.ul`
