@@ -13,8 +13,8 @@ const SettingsPane = styled.div`
   text-transform: capitalize;
 `;
 
-const Div = styled.div`
- width: 100%;
+const Form = styled.form`
+  width: 100%;
   display: flex;
   gap: 1em;
   flex-direction: row;
@@ -68,6 +68,7 @@ function Username({ setLogin }) {
     <input
       type="text"
       className="form-control"
+      autoComplete="username"
       placeholder="Username"
       onChange={handleChange}
     >
@@ -86,6 +87,7 @@ function Password({ setLogin }) {
     <input
       type="password"
       className="form-control"
+      autoComplete="current-password"
       placeholder="Password"
       onChange={handleChange}
     >
@@ -93,21 +95,22 @@ function Password({ setLogin }) {
   )
 }
 
-function Submit({ setLogin }) {
+function Submit({ login, setLogin, setServer }) {
   const [addCamera, setAddCamera] = useState()
+  const host = login ? login.host : null
 
   useEffect(() => {
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(addCamera)
+      body: JSON.stringify({ username: login ? login.username : null, password: login ? login.password : null })
     };
 
-    console.log(addCamera)
-    //addCamera && fetch(host + host_save_camera, requestOptions)
-    // .then(response => response.json())
-    // .then(data => setPostId(data.id));
-  }, [addCamera]);
+    console.log(host)
+    addCamera && fetch(host, requestOptions)
+      .then(response => response.json())
+      .then(data => console.log(data));
+  }, [login]);
 
   return (
     <div>
@@ -116,20 +119,20 @@ function Submit({ setLogin }) {
   )
 }
 
-function Auth() {
+function Auth({ setServer }) {
   const [login, setLogin] = useState()
   //fetch(url, { signal: 1 })
 
   return (
     <SettingsPane>
       <Label>Add server</Label>
-      <Div>
+      <Form>
         <Address setLogin={setLogin} />
         <Username setLogin={setLogin} />
         <Password setLogin={setLogin} />
         {console.log(login)}
-        <Submit />
-      </Div>
+        <Submit login={login} setLogin={setLogin} setServer={setServer} />
+      </Form>
     </SettingsPane>
   )
 }
