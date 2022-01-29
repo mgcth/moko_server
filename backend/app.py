@@ -5,14 +5,41 @@ from io import BytesIO
 from json import dumps, loads
 from sanic import Sanic
 from sanic import response
+from sanic_jwt import exceptions
+from sanic_jwt import initialize
+from sanic_jwt.decorators import protected
 from sanic_cors import CORS, cross_origin
 from websockets.exceptions import ConnectionClosed
 from sanic.response import json
 
 from camera import Camera
+from user import User
+
+
+users = [User(1, "user", "pass")]
+
+username_table = {u.username: u for u in users}
+userid_table = {u.user_id: u for u in users}
+
+async def authenticate(request, *args, **kwargs):
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+
+    if not username or not password:
+        raise exceptions.AuthenticationFailed()
+
+    user = username_table.get(username, None)
+    if user is None:
+        raise exceptions.AuthenticationFailed()
+
+    if password != user.password:
+        raise exceptions.AuthenticationFailed()
+
+    return user
 
 
 app = Sanic(__name__)
+initialize(app, authenticate=authenticate)
 
 app.config.WEBSOCKET_MAX_SIZE = 2 ** 20  # 20
 app.config.WEBSOCKET_MAX_QUEUE = 32  # 32
@@ -24,6 +51,7 @@ CORS(app)
 CAMERA_LIST_FILE = "../../camera_list.json"
 
 @app.route("/camera-config")
+@protected()
 async def camera(request):
     """
     Get camera configs endpoint.
@@ -40,6 +68,7 @@ async def camera(request):
 
 
 @app.route("/read-camera")
+@protected()
 async def read_camera(request):
     """
     Read available cameras endpoint.
@@ -55,6 +84,7 @@ async def read_camera(request):
 
 
 @app.route("/save-camera", methods=["POST"])
+@protected()
 async def save_camera(request):
     """
     Save camera (and write to cameras file) endpoint.
@@ -77,6 +107,7 @@ async def save_camera(request):
     return json({})
 
 @app.route("/delete-camera", methods=["POST"])
+@protected()
 async def save_camera(request):
     """
     Delete camera (and write to cameras file) endpoint.
@@ -100,6 +131,7 @@ async def save_camera(request):
 
 
 @app.websocket("/stream")
+@protected()
 async def stream(request, ws):
     """
     Websocket camera stream endpoint.
