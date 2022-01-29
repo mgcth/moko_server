@@ -15,8 +15,8 @@ function App() {
       <BrowserRouter>
         <AppHeader />
         <Routes>
-          <Route path="/*" element={<Home />} />
-          <Route path="settings/*" element={<Settings />} />
+          <Route path="" element={<Home />} />
+          <Route path="settings" element={<Settings />} />
           <Route path="camera" element={<Camera />} />
           <Route path="add-camera" element={<AddCamera />} />
         </Routes>
