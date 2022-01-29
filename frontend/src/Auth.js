@@ -14,8 +14,7 @@ function Address({ setLogin }) {
       type="text"
       className="form-control"
       placeholder="Address"
-      onChange={handleChange}
-    >
+      onChange={handleChange}>
     </input>
   )
 }
@@ -33,8 +32,7 @@ function Username({ setLogin }) {
       className="form-control"
       autoComplete="username"
       placeholder="Username"
-      onChange={handleChange}
-    >
+      onChange={handleChange}>
     </input>
   )
 }
@@ -52,49 +50,59 @@ function Password({ setLogin }) {
       className="form-control"
       autoComplete="current-password"
       placeholder="Password"
-      onChange={handleChange}
-    >
+      onChange={handleChange}>
     </input>
   )
 }
 
-function Submit({ login, setLogin, setServer }) {
-  const [addCamera, setAddCamera] = useState()
-  const host = login ? login.host : null
+function AddServer({ login, setServers }) {
+  const [loginState, setLoginState] = useState(false)
 
   useEffect(() => {
+    const host = loginState.host ? loginState.host : null
+    const username = loginState.username ? loginState.username : null
+    const password = loginState.password ? loginState.password : null
+
     const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: login ? login.username : null, password: login ? login.password : null })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: username, password: password })
     };
 
-    console.log(host)
-    addCamera && fetch(host, requestOptions)
+    host && fetch(host + "/auth", requestOptions)
       .then(response => response.json())
-      .then(data => console.log(data));
-  }, [login]);
+      .then(data => {
+        const requestVerify = {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer " + data["access_token"],
+          }
+        };
+
+        console.log(requestVerify)
+        fetch(host + "/auth/verify", requestVerify)
+
+        setServers(servers => ({ ...servers, [host]: { token: data["access_token"] } }))
+      });
+  }, [loginState]);
 
   return (
-    <div>
-      <AddButton className="btn" onClick={() => setAddCamera(setLogin)}>Add server</AddButton>
-    </div>
+    <AddButton className="btn" onClick={() => setLoginState(login)}>Add server</AddButton>
   )
 }
 
-function Auth({ setServer }) {
+function Auth({ setServers }) {
   const [login, setLogin] = useState()
-  //fetch(url, { signal: 1 })
 
   return (
     <SettingsPane>
       <Label>Add server</Label>
-      <Form>
+      <Form onSubmit={e => e.preventDefault()}>
         <Address setLogin={setLogin} />
         <Username setLogin={setLogin} />
         <Password setLogin={setLogin} />
-        {console.log(login)}
-        <Submit login={login} setLogin={setLogin} setServer={setServer} />
+        <AddServer login={login} setServers={setServers} />
       </Form>
     </SettingsPane>
   )
