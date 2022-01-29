@@ -13,68 +13,12 @@ import {
   host_read_cameras,
   host_save_camera
 } from "./Hosts.js"
-
-
-const Ul = styled.ul`
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5em;
-  margin: 0;
-  padding: 0;
-`;
-
-
-const Li = styled.li`
-
-`;
-
-const Section = styled.section`
-  margin: 6em 0;
-  padding: 0 20px;
-`;
-
-
-const CameraLink = styled(Link)`
-  font-size: 3em;
-  text-align: center;
-  color: #010b10;
-  background: #f0f0f0;
-  margin: 0;
-  padding: 1em;
-  display: block;
-  text-decoration: none;
-
-  &:visited {
-    color: #010b10;
-  }
-
-  &:hover {
-    color: #000;
-  }
-`;
-
-const Img = styled.img`
-  /* object-fit: cover;
-  width: 100%;
-  max-height: 720px; */
-`
-
-const CameraSettingsPane = styled.div`
-  background: #f0f0f0;
-  margin: 1em 0;
-  padding: 1em;
-  text-transform: capitalize;
-`;
-
-const Label = styled.label`
-  font-weight: bold;
-`
+import { Label, SettingsPane, Form, AddButton, Ul, Li, Section, CameraLink, Image } from "./Style.js"
 
 
 function CameraStream({ cameraName }) {
   const wsRef = useRef(null);
-  const [img, setImg] = useState();
+  const [image, setImage] = useState();
 
   useEffect(() => {
     if (!wsRef.current) {
@@ -88,9 +32,9 @@ function CameraStream({ cameraName }) {
       wsRef.current.onmessage = function (event) {
         const data = event.data;
         try {
-          setImg(data);
+          setImage(data);
         } catch (err) {
-          setImg(null)
+          setImage(null)
           console.log(err);
         }
       }
@@ -103,7 +47,7 @@ function CameraStream({ cameraName }) {
   }, [])
 
   return (
-    <Img className="img-fluid" src={img} alt="stream" />
+    <Image className="image-fluid" src={image} alt="stream" />
   );
 }
 
@@ -245,24 +189,6 @@ function CameraSaveFolder({ setCameraState }) {
   )
 }
 
-const AddButton = styled.button`
-  color: #010b10;
-  background: #f0f0f0;
-  border: 1px solid #f0f0f0;
-  padding: 0.375rem 0.75rem;
-
-  &:hover {
-    color: #fafafa;
-    background: #010b10;
-  }
-
-  &:focus {
-    color: #fafafa;
-    background: #010b10;
-    box-shadow: none;
-  }
-`
-
 function CameraSave({ cameraState }) {
   const [addCamera, setAddCamera] = useState()
 
@@ -287,7 +213,7 @@ function CameraSave({ cameraState }) {
 function CameraSettings({ setCameraState }) {
   return (
     <React.Fragment>
-      <CameraSettingsPane>
+      <SettingsPane>
         <Label>Camera settings</Label>
         <CameraName setCameraState={setCameraState} />
         <CameraModels setCameraState={setCameraState} />
@@ -295,7 +221,7 @@ function CameraSettings({ setCameraState }) {
         <CameraQuality setCameraState={setCameraState} />
         <CameraRotation setCameraState={setCameraState} />
         <CameraSaveFolder setCameraState={setCameraState} />
-      </CameraSettingsPane>
+      </SettingsPane>
     </React.Fragment>
   )
 }

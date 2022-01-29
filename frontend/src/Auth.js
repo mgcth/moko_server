@@ -1,43 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import styled from 'styled-components';
 import Select from 'react-select';
-
-const Label = styled.label`
-  font-weight: bold;
-`
-
-const SettingsPane = styled.div`
-  background: #f0f0f0;
-  margin: 1em 0;
-  padding: 1em;
-  text-transform: capitalize;
-`;
-
-const Form = styled.form`
-  width: 100%;
-  display: flex;
-  gap: 1em;
-  flex-direction: row;
-`
-
-const AddButton = styled.button`
-  color: #010b10;
-  background: #f0f0f0;
-  border: 1px solid #f0f0f0;
-  padding: 0.375rem 0.75rem;
-  min-width: 120px;
-
-  &:hover {
-    color: #f0f0f0;
-    background: #010b10;
-  }
-
-  &:focus {
-    color: #fafafa;
-    background: #010b10;
-    box-shadow: none;
-  }
-`
+import { Label, SettingsPane, Form, AddButton } from "./Style.js"
 
 function Address({ setLogin }) {
   const [handleChange] = useState((e) => {
