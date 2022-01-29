@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Camera, AddCamera } from './Camera.js'
 import { useFetchGet } from "./useFetchGet.js"
 import { host, host_read_camera, host_delete_camera } from "./Hosts.js"
+import { Auth } from "./Auth.js"
 
 const Nav = styled.nav`
 `;
@@ -119,6 +120,7 @@ function Home() {
 
   return (
     <Section className="Home">
+      <Auth />
       <Ul>
         {cameraList}
         <Li>

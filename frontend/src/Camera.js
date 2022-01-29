@@ -72,9 +72,6 @@ const Label = styled.label`
 `
 
 
-
-
-
 function CameraStream({ cameraName }) {
   const wsRef = useRef(null);
   const [img, setImg] = useState();
@@ -251,8 +248,8 @@ function CameraSaveFolder({ setCameraState }) {
 const AddButton = styled.button`
   color: #010b10;
   background: #f0f0f0;
-  border-color: #f0f0f0;
-  padding: 1em;
+  border: 1px solid #f0f0f0;
+  padding: 0.375rem 0.75rem;
 
   &:hover {
     color: #fafafa;
@@ -262,7 +259,6 @@ const AddButton = styled.button`
   &:focus {
     color: #fafafa;
     background: #010b10;
-    border: none;
     box-shadow: none;
   }
 `
