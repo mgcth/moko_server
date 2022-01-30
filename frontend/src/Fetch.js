@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
 
+function FetchSimple(url, type, header) {
+    return fetch(url, {
+        headers: header,
+        method: type
+    })
+        .then(response => response.json())
+        .then(data => data)
+}
+
 function Fetch(url, type, header, setData, setError) {
     const abortCont = new AbortController()
 
@@ -43,4 +52,4 @@ function useFetchGet(url, type, header) {
     return { data, error }
 }
 
-export { useFetchGet, Fetch };
+export { useFetchGet, Fetch, FetchSimple };
