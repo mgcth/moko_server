@@ -106,6 +106,7 @@ async def save_camera(request):
 
     return json({})
 
+
 @app.route("/delete-camera", methods=["POST"])
 @protected()
 async def save_camera(request):
@@ -131,12 +132,12 @@ async def save_camera(request):
 
 
 @app.websocket("/stream")
-@protected()
+@protected(query_string_set=True)
 async def stream(request, ws):
     """
     Websocket camera stream endpoint.
     """
-
+    
     camera_name = await ws.recv()
 
     data = {}
