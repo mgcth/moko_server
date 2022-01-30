@@ -12,7 +12,6 @@ function ListCameras(data, server, setRemove) {
     <div>
       <Label>{server}</Label>
       <Ul>
-
         {
           Object.keys(data).length !== 0 && Object.keys(data).map((key, data_index) => {
             return (
@@ -39,7 +38,6 @@ function ListCameras(data, server, setRemove) {
               </Li>
             )
           })
-
         }
         <Li key="new">
           <CameraLink to="add-camera">
@@ -66,8 +64,8 @@ function ListServers(servers) {
   return { cameras, serv }
 }
 
-function Home() {
-  const [servers, setServers] = useState({})
+function Home({ servers, setServers }) {
+  //const [servers, setServers] = useState({})
   const [remove, setRemove] = useState(false)
   const [cameraList, setCameraList] = useState()
   const [serverList, setServerList] = useState()
