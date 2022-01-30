@@ -66,10 +66,6 @@ function Home({ servers, setServers }) {
   //const [servers, setServers] = useState({})
   const [remove, setRemove] = useState(false)
   const [cameraList, setCameraList] = useState()
-  const [serverList, setServerList] = useState()
-  //const { data, error } = useFetchGet(host + host_read_camera)
-
-  const [data, setData] = useState([])
   const [error, setError] = useState(null)
 
   useEffect(() => {
@@ -77,8 +73,6 @@ function Home({ servers, setServers }) {
     serv.map((server, index) => {
       cameras[index].then(value => {
         setCameraList(() => ListCameras(value, servers[server], setRemove))
-        console.log(cameraList)
-
       })
     })
   }, [servers, remove])

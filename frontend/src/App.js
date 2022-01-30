@@ -20,7 +20,7 @@ function App() {
           <Route path="" element={<Home servers={servers} setServers={setServers} />} />
           <Route path="settings" element={<Settings />} />
           <Route path="camera" element={<Camera />} />
-          <Route path="add-camera" element={<AddCamera servers={servers} />} />
+          <Route path="add-camera" element={<AddCamera />} />
         </Routes>
         <AppFooter />
       </BrowserRouter>
