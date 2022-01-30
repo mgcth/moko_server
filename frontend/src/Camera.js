@@ -16,13 +16,14 @@ import {
 import { Label, SettingsPane, Form, AddButton, Ul, Li, Section, CameraLink, Image } from "./Style.js"
 
 
-function CameraStream({ cameraName }) {
+function CameraStream({ cameraName, server }) {
   const wsRef = useRef(null);
   const [image, setImage] = useState();
-  console.log(cameraName)
+
   useEffect(() => {
     if (!wsRef.current) {
-      wsRef.current = new WebSocket(host_ws + host_stream);
+      console.log(host_ws + host_stream + "?access_token=" + server.token)
+      wsRef.current = new WebSocket(host_ws + host_stream + "?access_token=" + server.token);
       wsRef.current.onopen = () => {
         wsRef.current.send(cameraName);
       }
@@ -239,11 +240,13 @@ function AddCamera({ props, servers }) {
 }
 
 function Camera(props) {
-  const cameraName = useLocation().state
+  const state = useLocation().state
+  const cameraName = state[0]
+  const server = state[1]
 
   return (
     < Section className="camera-stream" >
-      <CameraStream cameraName={cameraName} />
+      <CameraStream cameraName={cameraName} server={server} />
     </Section >
   );
 }

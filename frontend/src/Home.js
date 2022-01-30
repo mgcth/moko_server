@@ -10,7 +10,7 @@ import { Label, SettingsPane, Form, AddButton, Ul, Li, Section, CameraLink, Imag
 function ListCameras(data, server, setRemove) {
   return (
     <div>
-      <Label>{server}</Label>
+      <Label>{server.host}</Label>
       <Ul>
         {
           Object.keys(data).length !== 0 && Object.keys(data).map((key, data_index) => {
@@ -30,10 +30,10 @@ function ListCameras(data, server, setRemove) {
                       body: JSON.stringify(key)
                     };
 
-                    fetch(server + host_delete_camera, deleteOptions)
+                    fetch(server.host + host_delete_camera, deleteOptions)
                   }
                   }>x</RemoveLink>
-                  <CameraLink to="camera" state={key}>{key}</CameraLink>
+                  <CameraLink to="camera" state={[key, server]}>{key}</CameraLink>
                 </ParentDiv>
               </Li>
             )
@@ -76,7 +76,7 @@ function Home({ servers, setServers }) {
     const { cameras, serv } = ListServers(servers)
     serv.map((server, index) => {
       cameras[index].then(value => {
-        setCameraList(() => ListCameras(value, server, setRemove))
+        setCameraList(() => ListCameras(value, servers[server], setRemove))
         console.log(cameraList)
 
       })
