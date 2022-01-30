@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -10,15 +10,17 @@ import AppHeader from './Header';
 import AppFooter from './Footer';
 
 function App() {
+  const [servers, setServers] = useState({})
+
   return (
     <div className="App">
       <BrowserRouter>
         <AppHeader />
         <Routes>
-          <Route path="" element={<Home />} />
+          <Route path="" element={<Home servers={servers} setServers={setServers} />} />
           <Route path="settings" element={<Settings />} />
           <Route path="camera" element={<Camera />} />
-          <Route path="add-camera" element={<AddCamera />} />
+          <Route path="add-camera" element={<AddCamera servers={servers} />} />
         </Routes>
         <AppFooter />
       </BrowserRouter>

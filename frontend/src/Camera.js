@@ -19,7 +19,7 @@ import { Label, SettingsPane, Form, AddButton, Ul, Li, Section, CameraLink, Imag
 function CameraStream({ cameraName }) {
   const wsRef = useRef(null);
   const [image, setImage] = useState();
-
+  console.log(cameraName)
   useEffect(() => {
     if (!wsRef.current) {
       wsRef.current = new WebSocket(host_ws + host_stream);
