@@ -40,9 +40,7 @@ function ListCameras(data, server, setRemove) {
           })
         }
         <Li key="new">
-          <CameraLink to="add-camera">
-            +
-          </CameraLink>
+          <CameraLink to="add-camera" state={server}>+</CameraLink>
         </Li>
       </Ul>
     </div>

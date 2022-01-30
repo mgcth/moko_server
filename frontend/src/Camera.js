@@ -189,7 +189,7 @@ function CameraSaveFolder({ setCameraState }) {
   )
 }
 
-function CameraSave({ cameraState }) {
+function CameraSave({ cameraState, server }) {
   const [addCamera, setAddCamera] = useState()
 
   useEffect(() => {
@@ -210,29 +210,30 @@ function CameraSave({ cameraState }) {
   )
 }
 
-function CameraSettings({ setCameraState }) {
+function CameraSettings({ setCameraState, server }) {
   return (
     <React.Fragment>
       <SettingsPane>
         <Label>Camera settings</Label>
-        <CameraName setCameraState={setCameraState} />
-        <CameraModels setCameraState={setCameraState} />
-        <CameraModes setCameraState={setCameraState} />
-        <CameraQuality setCameraState={setCameraState} />
-        <CameraRotation setCameraState={setCameraState} />
-        <CameraSaveFolder setCameraState={setCameraState} />
+        <CameraName setCameraState={setCameraState} server={server} />
+        <CameraModels setCameraState={setCameraState} server={server} />
+        <CameraModes setCameraState={setCameraState} server={server} />
+        <CameraQuality setCameraState={setCameraState} server={server} />
+        <CameraRotation setCameraState={setCameraState} server={server} />
+        <CameraSaveFolder setCameraState={setCameraState} server={server} />
       </SettingsPane>
     </React.Fragment>
   )
 }
 
-function AddCamera() {
+function AddCamera({ props, servers }) {
   const [cameraState, setCameraState] = useState([])
+  const server = servers[useLocation().state]
 
   return (
     <Section>
-      <CameraSettings setCameraState={setCameraState} />
-      <CameraSave cameraState={cameraState} />
+      <CameraSettings setCameraState={setCameraState} server={server} />
+      <CameraSave cameraState={cameraState} server={server} />
     </Section>
   );
 }
