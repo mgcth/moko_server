@@ -263,6 +263,7 @@ dist
 
 ## Misc
 .vscode
-moko_flask/env
-moko_flask/__pycache__
+frontend/node_modules
+backend/env
+backend/__pycache__
 *.ttf
