@@ -4,10 +4,10 @@ import {
   Routes,
   Route
 } from "react-router-dom";
-import { Home, AddCamera, Camera } from './Home';
-import Settings from './Settings';
-import AppHeader from './Header';
-import AppFooter from './Footer';
+import { Home, AddCamera, Camera } from './Home.js';
+import Settings from './Settings.js';
+import AppHeader from './Header.js';
+import AppFooter from './Footer.js';
 
 function App() {
   const [servers, setServers] = useState({})
