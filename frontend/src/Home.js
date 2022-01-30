@@ -7,47 +7,63 @@ import { host, host_read_camera, host_delete_camera } from "./Hosts.js"
 import { Auth } from "./Auth.js"
 import { Label, SettingsPane, Form, AddButton, Ul, Li, Section, CameraLink, Image, Nav, ParentDiv, RemoveLink } from "./Style.js"
 
-function ListCameras(data, setRemove) {
+function ListCameras(data, server, setRemove) {
   return (
-    Object.keys(data).length !== 0 && Object.keys(data).map((key, data_index) => {
-      return (
-        <Li key={key}>
-          <ParentDiv>
-            {/* <RemoveLink onClick={() => {
-              setRemove(key)
-              delete data[key]
+    <div>
+      <Label>{server}</Label>
+      <Ul>
 
-              const deleteOptions = {
-                method: 'POST',
-                headers: {
-                  "Content-type": "application/json",
-                  "Authorization": "Bearer " + server.token,
-                },
-                body: JSON.stringify(key)
-              };
+        {
+          Object.keys(data).length !== 0 && Object.keys(data).map((key, data_index) => {
+            return (
+              <Li key={key}>
+                <ParentDiv>
+                  <RemoveLink onClick={() => {
+                    setRemove(key)
+                    delete data[key]
 
-              fetch(server + host_delete_camera, deleteOptions)
-            }
-            }>x</RemoveLink> */}
-            <CameraLink to="camera" state={key}>{key}</CameraLink>
-          </ParentDiv>
+                    const deleteOptions = {
+                      method: 'POST',
+                      headers: {
+                        "Content-type": "application/json",
+                        "Authorization": "Bearer " + server.token,
+                      },
+                      body: JSON.stringify(key)
+                    };
+
+                    fetch(server + host_delete_camera, deleteOptions)
+                  }
+                  }>x</RemoveLink>
+                  <CameraLink to="camera" state={key}>{key}</CameraLink>
+                </ParentDiv>
+              </Li>
+            )
+          })
+
+        }
+        <Li key="new">
+          <CameraLink to="add-camera">
+            +
+          </CameraLink>
         </Li>
-      )
-    })
+      </Ul>
+    </div>
   )
 }
 
-function ListServers(servers, setServers) {
+function ListServers(servers) {
   const cameras = []
+  const serv = []
   Object.keys(servers).length !== 0 && Object.keys(servers).map((server, index) => {
     const header = {
       "Content-type": "application/json",
       "Authorization": "Bearer " + servers[server].token,
     }
-    cameras.push([servers[server], FetchSimple(server + host_read_camera, "GET", header)])
+    cameras.push(FetchSimple(server + host_read_camera, "GET", header))
+    serv.push(server)
   })
 
-  return cameras
+  return { cameras, serv }
 }
 
 function Home() {
@@ -61,27 +77,20 @@ function Home() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    const cameras = ListServers(servers)
-    Promise.all(cameras)
-      .then(a => a[0][1])
-      .then(a => setCameraList(() => ListCameras(a, setRemove)))
+    const { cameras, serv } = ListServers(servers)
+    serv.map((server, index) => {
+      cameras[index].then(value => {
+        setCameraList(() => ListCameras(value, server, setRemove))
+        console.log(cameraList)
+
+      })
+    })
   }, [servers, remove])
 
   return (
     <Section className="Home">
       <Auth setServers={setServers} />
-      <div>
-        {/* <Label>{server}</Label> */}
-
-        <Ul>
-          {cameraList}
-          <Li key="new">
-            <CameraLink to="add-camera">
-              +
-            </CameraLink>
-          </Li>
-        </Ul>
-      </div>
+      {cameraList}
     </Section >
   )
 }
