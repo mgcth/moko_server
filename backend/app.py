@@ -11,6 +11,8 @@ from sanic_jwt.decorators import protected
 from sanic_cors import CORS, cross_origin
 from websockets.exceptions import ConnectionClosed
 from sanic.response import json
+from PIL import Image
+import datetime
 
 from camera import Camera
 from user import User
@@ -137,7 +139,7 @@ async def stream(request, ws):
     """
     Websocket camera stream endpoint.
     """
-    
+
     camera_name = await ws.recv()
 
     data = {}
@@ -158,6 +160,10 @@ async def stream(request, ws):
             await ws.send(
                f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
             )
+            path = date["path"][-1] == "/" ? date["path"] : date["path"] + "/"
+            image = Image.open(frame)
+            date = datetime.now().strftime("%Y-%m-%d-%H%M%S")
+            image.save(path + date. + ".jpg")
     except:
         print("Closing connection.")
     finally:
