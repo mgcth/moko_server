@@ -4,84 +4,26 @@ import { useLocation } from "react-router";
 import { Link, renderMatches } from 'react-router-dom';
 import styled from 'styled-components';
 import Select from 'react-select';
-import { useFetchGet } from "./useFetchGet.js"
+import { useFetchGet } from "./Fetch.js"
+import {
+  host,
+  host_ws,
+  host_stream,
+  host_camera_config,
+  host_read_cameras,
+  host_save_camera
+} from "./Hosts.js"
+import { Label, SettingsPane, Form, AddButton, Ul, Li, Section, CameraLink, Image } from "./Style.js"
 
 
-const host = "http://moko:5000"
-const host_ws = "ws://moko:5000"
-const host_stream = "/stream"
-const host_camera_config = "/camera-config"
-const host_read_cameras = "/read-cameras"
-const host_save_camera = "/save-camera"
-
-
-const Ul = styled.ul`
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5em;
-  margin: 0;
-  padding: 0;
-`;
-
-
-const Li = styled.li`
-
-`;
-
-const Section = styled.section`
-  margin: 6em 0;
-  padding: 0 20px;
-`;
-
-
-const CameraLink = styled(Link)`
-  font-size: 3em;
-  text-align: center;
-  color: #010b10;
-  background: #f0f0f0;
-  margin: 0;
-  padding: 1em;
-  display: block;
-  text-decoration: none;
-
-  &:visited {
-    color: #010b10;
-  }
-
-  &:hover {
-    color: #000;
-  }
-`;
-
-const Img = styled.img`
-  /* object-fit: cover;
-  width: 100%;
-  max-height: 720px; */
-`
-
-const CameraSettingsPane = styled.div`
-  background: #f0f0f0;
-  margin: 1em 0;
-  padding: 1em;
-  text-transform: capitalize;
-`;
-
-const Label = styled.label`
-  font-weight: bold;
-`
-
-
-
-
-
-function CameraStream({ cameraName }) {
+function CameraStream({ cameraName, server }) {
   const wsRef = useRef(null);
-  const [img, setImg] = useState();
+  const [image, setImage] = useState();
 
   useEffect(() => {
     if (!wsRef.current) {
-      wsRef.current = new WebSocket(host_ws + host_stream);
+      console.log(host_ws + host_stream + "?access_token=" + server.token)
+      wsRef.current = new WebSocket(host_ws + host_stream + "?access_token=" + server.token);
       wsRef.current.onopen = () => {
         wsRef.current.send(cameraName);
       }
@@ -91,9 +33,9 @@ function CameraStream({ cameraName }) {
       wsRef.current.onmessage = function (event) {
         const data = event.data;
         try {
-          setImg(data);
+          setImage(data);
         } catch (err) {
-          setImg(null)
+          setImage(null)
           console.log(err);
         }
       }
@@ -106,18 +48,16 @@ function CameraStream({ cameraName }) {
   }, [])
 
   return (
-    <Img className="img-fluid" src={img} alt="stream" />
-  );
+    <Image className="image-fluid" src={image} alt="stream" />
+  )
 }
 
 function CameraName({ setCameraState }) {
-  const { data, error } = useFetchGet(host + host_camera_config)
-
   const [handleChange] = useState((e) => {
     return (e) => {
       setCameraState(cameraState => ({ ...cameraState, name: e.target.value }))
-    };
-  });
+    }
+  })
 
   return (
     <div>
@@ -133,14 +73,18 @@ function CameraName({ setCameraState }) {
   )
 }
 
-function CameraModels({ setCameraState }) {
-  const { data, error } = useFetchGet(host + host_camera_config)
+function CameraModels({ setCameraState, server }) {
+  const headers = {
+    "Content-type": "application/json",
+    "Authorization": "Bearer " + server.token,
+  }
+  const { data, error } = useFetchGet(server.host + host_camera_config, "GET", headers)
 
   const [handleChange] = useState((e) => {
     return (e) => {
       setCameraState(cameraState => ({ ...cameraState, model: e.value }))
-    };
-  });
+    }
+  })
 
   return (
     <div>
@@ -153,14 +97,18 @@ function CameraModels({ setCameraState }) {
   )
 }
 
-function CameraModes({ setCameraState }) {
-  const { data, error } = useFetchGet(host + host_camera_config)
+function CameraModes({ setCameraState, server }) {
+  const headers = {
+    "Content-type": "application/json",
+    "Authorization": "Bearer " + server.token,
+  }
+  const { data, error } = useFetchGet(server.host + host_camera_config, "GET", headers)
 
   const [handleChange] = useState((e) => {
     return (e) => {
       setCameraState(cameraState => ({ ...cameraState, mode: e.value }))
-    };
-  });
+    }
+  })
 
   return (
     <div>
@@ -178,8 +126,6 @@ function CameraModes({ setCameraState }) {
 }
 
 function CameraQuality({ setCameraState }) {
-  const { data, error } = useFetchGet(host + host_camera_config)
-
   const [handleChange] = useState((e) => {
     return (e) => {
       let value = 10
@@ -187,8 +133,8 @@ function CameraQuality({ setCameraState }) {
         value = e.target.value
       }
       setCameraState(cameraState => ({ ...cameraState, quality: parseInt(value, 10) }))
-    };
-  });
+    }
+  })
 
   return (
     <div>
@@ -207,13 +153,11 @@ function CameraQuality({ setCameraState }) {
 }
 
 function CameraRotation({ setCameraState }) {
-  const { data, error } = useFetchGet(host + host_camera_config)
-
   const [handleChange] = useState((e) => {
     return (e) => {
       setCameraState(cameraState => ({ ...cameraState, rotation: e.value }))
-    };
-  });
+    }
+  })
 
   return (
     <div>
@@ -226,13 +170,11 @@ function CameraRotation({ setCameraState }) {
 }
 
 function CameraSaveFolder({ setCameraState }) {
-  const { data, error } = useFetchGet(host + host_camera_config)
-
   const [handleChange] = useState((e) => {
     return (e) => {
       setCameraState(cameraState => ({ ...cameraState, save_folder: e.target.value }))
-    };
-  });
+    }
+  })
 
   return (
     <div>
@@ -248,81 +190,65 @@ function CameraSaveFolder({ setCameraState }) {
   )
 }
 
-const AddButton = styled.button`
-  color: #010b10;
-  background: #f0f0f0;
-  border-color: #f0f0f0;
-  padding: 1em;
-
-  &:hover {
-    color: #fafafa;
-    background: #010b10;
-  }
-
-  &:focus {
-    color: #fafafa;
-    background: #010b10;
-    border: none;
-    box-shadow: none;
-  }
-`
-
-function CameraSave({ cameraState }) {
+function CameraSave({ cameraState, server }) {
   const [addCamera, setAddCamera] = useState()
 
   useEffect(() => {
     const requestOptions = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + server.token,
+      },
       body: JSON.stringify(addCamera)
     };
 
-    console.log(addCamera)
-    addCamera && fetch(host + host_save_camera, requestOptions)
+    addCamera && fetch(server.host + host_save_camera, requestOptions)
     // .then(response => response.json())
     // .then(data => setPostId(data.id));
-  }, [addCamera]);
+  }, [addCamera])
 
   return (
     <AddButton className="btn" onClick={() => setAddCamera(cameraState)}>Add camera</AddButton>
   )
 }
 
-function CameraSettings({ setCameraState }) {
+function CameraSettings({ setCameraState, server }) {
   return (
-    <React.Fragment>
-      <CameraSettingsPane>
-        <Label>Camera settings</Label>
-        <CameraName setCameraState={setCameraState} />
-        <CameraModels setCameraState={setCameraState} />
-        <CameraModes setCameraState={setCameraState} />
-        <CameraQuality setCameraState={setCameraState} />
-        <CameraRotation setCameraState={setCameraState} />
-        <CameraSaveFolder setCameraState={setCameraState} />
-      </CameraSettingsPane>
-    </React.Fragment>
+    <SettingsPane>
+      <Label>Camera settings</Label>
+      <CameraName setCameraState={setCameraState} />
+      <CameraModels setCameraState={setCameraState} server={server} />
+      <CameraModes setCameraState={setCameraState} server={server} />
+      <CameraQuality setCameraState={setCameraState} />
+      <CameraRotation setCameraState={setCameraState} />
+      <CameraSaveFolder setCameraState={setCameraState} />
+    </SettingsPane>
   )
 }
 
-function AddCamera() {
+function AddCamera(props) {
   const [cameraState, setCameraState] = useState([])
+  const server = useLocation().state
 
   return (
     <Section>
-      <CameraSettings setCameraState={setCameraState} />
-      <CameraSave cameraState={cameraState} />
+      <CameraSettings setCameraState={setCameraState} server={server} />
+      <CameraSave cameraState={cameraState} server={server} />
     </Section>
-  );
+  )
 }
 
 function Camera(props) {
-  const cameraName = useLocation().state
+  const state = useLocation().state
+  const cameraName = state[0]
+  const server = state[1]
 
   return (
     < Section className="camera-stream" >
-      <CameraStream cameraName={cameraName} />
+      <CameraStream cameraName={cameraName} server={server} />
     </Section >
-  );
+  )
 }
 
 export { AddCamera, Camera };
