@@ -6,8 +6,3 @@ Moko is a separate client (frontend) and server (backend) component to manage ca
 - Roll your own authentication on the server, or use the provided JWT authentication.
 - Support Raspberry Pi camera modules (V1 and V2).
 - Support basic motion detection and object detection.
-
-## Client
-
-
-## Server
