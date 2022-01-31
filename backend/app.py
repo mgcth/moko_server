@@ -1,18 +1,18 @@
 import sys
 import base64
 import asyncio
+from PIL import Image
 from io import BytesIO
 from json import dumps, loads
+from datetime import datetime
 from sanic import Sanic
 from sanic import response
+from sanic.response import json
 from sanic_jwt import exceptions
 from sanic_jwt import initialize
 from sanic_jwt.decorators import protected
 from sanic_cors import CORS, cross_origin
 from websockets.exceptions import ConnectionClosed
-from sanic.response import json
-from PIL import Image
-import datetime
 
 from camera import Camera
 from user import User
@@ -160,11 +160,16 @@ async def stream(request, ws):
             await ws.send(
                f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
             )
-            path = date["path"][-1] == "/" ? date["path"] : date["path"] + "/"
-            image = Image.open(frame)
-            date = datetime.now().strftime("%Y-%m-%d-%H%M%S")
-            image.save(path + date. + ".jpg")
-    except:
+
+            print(data["save_folder"])
+            path =  data["save_folder"] if data["save_folder"][-1] == "/" else data["save_folder"] + "/"
+            date = datetime.now().strftime("%Y%m%d%G%M%S")
+            print(date)
+            image = Image.open(BytesIO(frame))
+            image.save(path + date + ".jpg")
+
+    except Exception as e:
+        print(e)
         print("Closing connection.")
     finally:
         camera.close()

@@ -33,8 +33,8 @@ class Camera():
         self.quality = quality
 
         model = self._model()
-        resolution = self.settings.modes[model][resolution_id][1]
-        self.camera.resolution = resolution
+        self.resolution = self.settings.modes[model][resolution_id][1]
+        self.camera.resolution = self.resolution
         
     def __del__(self):
         """
