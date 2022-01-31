@@ -1,5 +1,7 @@
-from picamera import PiCamera, PiCameraCircularIO
+from PIL import Image
 from io import BytesIO
+from datetime import datetime
+from picamera import PiCamera, PiCameraCircularIO
 from camera_settings import CameraSettings
 
 
@@ -24,7 +26,6 @@ class Camera():
             rotation: camera rotation
             quality: stream feed quality
         """
-
         self.name = name
         self.settings = CameraSettings()
         self.camera = PiCamera()
@@ -40,35 +41,30 @@ class Camera():
         """
         Delete camera object, close camera.
         """
-
         self.camera.close()
 
     def __enter__(self):
         """
         Allow context manager.
         """
-
         return self
 
     def __exit__(self, type, value, traceback):
         """
         Exit camera object and close camera.
         """
-
         self.close()
 
     def close(self):
         """
         Close camera function.
         """
-
         self.camera.close()
 
     def _model(self):
         """
         Get the connected model from module.
         """
-
         module = self.camera.revision
         model = self.settings.module.get(module, "none")
 
@@ -79,7 +75,6 @@ class Camera():
         """
         Get camera model.
         """
-
         return self._model()
 
     @property
@@ -87,7 +82,6 @@ class Camera():
         """
         Get available camera modes.
         """
-
         modes = self.settings.modes.get(self._model(), "none")
 
         return modes
@@ -96,11 +90,20 @@ class Camera():
         """
         Get next frame in feed.
         """
-
         stream = BytesIO()
         for _ in self.camera.capture_continuous(stream, "jpeg", use_video_port=True, quality=self.quality):
             stream.seek(0)
-            yield stream.read()
+            self.frame = stream.read()
+            yield self.frame
             stream.truncate()
             stream.seek(0)
+
+    def save_frame(self, path):
+        """
+        Save frame to path.
+        """
+        path =  path if path[-1] == "/" else path + "/"
+        date = datetime.now().strftime("%Y%m%d%G%M%S")
+        image = Image.open(BytesIO(self.frame))
+        image.save(path + date + ".jpg")
 

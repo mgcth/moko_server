@@ -1,10 +1,8 @@
 import sys
 import base64
 import asyncio
-from PIL import Image
 from io import BytesIO
 from json import dumps, loads
-from datetime import datetime
 from sanic import Sanic
 from sanic import response
 from sanic.response import json
@@ -160,13 +158,7 @@ async def stream(request, ws):
             await ws.send(
                f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
             )
-
-            print(data["save_folder"])
-            path =  data["save_folder"] if data["save_folder"][-1] == "/" else data["save_folder"] + "/"
-            date = datetime.now().strftime("%Y%m%d%G%M%S")
-            print(date)
-            image = Image.open(BytesIO(frame))
-            image.save(path + date + ".jpg")
+            camera.save_frame(data["save_folder"])
 
     except Exception as e:
         print(e)
