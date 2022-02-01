@@ -8,32 +8,46 @@ from camera_settings import CameraSettings
 class CameraManager:
     """
     Camera manager, managing different types of camera hardware.
-    Note that a class for that paritcular camera must be implemented.
-    This class will only scan and make available cameras that have a class implemented.
+    Note that, a class for that paritcular camera must be implemented.
+    So, this manager will only scan and make available cameras that have
+    a class implemented.
     """
 
     def __init__(self, camera_classes=[]):
         """
 
         """
-        self.camera_classes
+        self.camera_classes = camera_classes
 
     def scan(self):
         """
-        Scan hardware for available cameras from defined calsses.
+        Scan hardware for available cameras from defined calsses. Or rather,
+        use the implemented camera classes to check if any camera is found. Let
+        the user select which class to use if several find the same camera.
         """
-        pass
+        for camera_class in self.camera_classes:
+            camera = camera_class()
+            camera.scan()
 
     def select(self, camera):
         """
-        Select an available camera
+        Select an available camera, make that camera unavailable if set.
         """
         pass
+
+    def deselect(self, camera):
+        """
+        Mark the selected camera as free again.
+        """
+        pass
+
+
 
 
 class RaspberryPiCamera:
     """
-    Raspberry Pi Camera class, for now only supporting the Raspberry Pi Official cameras V1 and V2.
+    Raspberry Pi Camera class, for now only supporting the Raspberry Pi Official
+    cameras V1 and V2.
     """
 
     def __init__(
@@ -44,7 +58,8 @@ class RaspberryPiCamera:
         quality=10
     ):
         """
-        Initialise the camera with a name, resolution (mode), rotation and stream quality settings.
+        Initialise the camera with a name, resolution (mode), rotation and stream
+        quality settings.
 
         Input:
             name: camera name
@@ -125,7 +140,12 @@ class RaspberryPiCamera:
         Get next frame in feed.
         """
         stream = BytesIO()
-        for _ in self.camera.capture_continuous(stream, "jpeg", use_video_port=True, quality=self.quality):
+        for _ in self.camera.capture_continuous(
+            stream,
+            "jpeg",
+            use_video_port=True,
+            quality=self.quality
+        ):
             stream.seek(0)
             self._frame = stream.read()
             yield self._frame
@@ -136,7 +156,6 @@ class RaspberryPiCamera:
         """
         Save frame to path.
         """
-
         path =  path if path[-1] == "/" else path + "/"
         date = datetime.now().strftime("%Y%m%d%G%M%S")
         image = Image.open(BytesIO(self._frame))
