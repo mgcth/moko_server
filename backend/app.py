@@ -109,7 +109,7 @@ async def save_camera(request):
 
 @app.route("/delete-camera", methods=["POST"])
 @protected()
-async def save_camera(request):
+async def delete_camera(request):
     """
     Delete camera (and write to cameras file) endpoint.
     """
