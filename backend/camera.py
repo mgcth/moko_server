@@ -5,9 +5,35 @@ from picamera import PiCamera, PiCameraCircularIO
 from camera_settings import CameraSettings
 
 
-class Camera():
+class CameraManager:
     """
-    Camera class, for now only supporting the Raspberry Pi Official cameras V1 and V2.
+    Camera manager, managing different types of camera hardware.
+    Note that a class for that paritcular camera must be implemented.
+    This class will only scan and make available cameras that have a class implemented.
+    """
+
+    def __init__(self, camera_classes=[]):
+        """
+
+        """
+        self.camera_classes
+
+    def scan(self):
+        """
+        Scan hardware for available cameras from defined calsses.
+        """
+        pass
+
+    def select(self, camera):
+        """
+        Select an available camera
+        """
+        pass
+
+
+class RaspberryPiCamera:
+    """
+    Raspberry Pi Camera class, for now only supporting the Raspberry Pi Official cameras V1 and V2.
     """
 
     def __init__(
@@ -36,12 +62,13 @@ class Camera():
         model = self._model()
         self.resolution = self.settings.modes[model][resolution_id][1]
         self.camera.resolution = self.resolution
-        
+        self._frame = None
+
     def __del__(self):
         """
         Delete camera object, close camera.
         """
-        self.camera.close()
+        self.close()
 
     def __enter__(self):
         """
@@ -86,6 +113,13 @@ class Camera():
 
         return modes
 
+    @property
+    def frame(self):
+        """
+        Get the current frame.
+        """
+        return self._frame
+
     def next_frame(self):
         """
         Get next frame in feed.
@@ -93,8 +127,8 @@ class Camera():
         stream = BytesIO()
         for _ in self.camera.capture_continuous(stream, "jpeg", use_video_port=True, quality=self.quality):
             stream.seek(0)
-            self.frame = stream.read()
-            yield self.frame
+            self._frame = stream.read()
+            yield self._frame
             stream.truncate()
             stream.seek(0)
 
@@ -102,8 +136,8 @@ class Camera():
         """
         Save frame to path.
         """
+
         path =  path if path[-1] == "/" else path + "/"
         date = datetime.now().strftime("%Y%m%d%G%M%S")
-        image = Image.open(BytesIO(self.frame))
+        image = Image.open(BytesIO(self._frame))
         image.save(path + date + ".jpg")
-
