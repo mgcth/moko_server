@@ -19,7 +19,7 @@ class CameraManager:
         """
         self.camera_classes = camera_classes
         self.cameras = []
-        self.selected = None
+        self.selected = []
 
     def scan(self):
         """
@@ -37,15 +37,15 @@ class CameraManager:
         """
         Select an available camera, make that camera unavailable if set.
         """
-        self.selected = self.cameras[camera]
-        # should I also create an instant of the object here, and destroy it in deselect?
+        self.selected.append(self.cameras[camera])
+        # should I create an instant here, and destroy it in deselect?
 
     def deselect(self, camera):
         """
         Mark the selected camera as free again.
         """
-        #self.selected.close()
-        self.selected = None
+        #self.selected[camera].close()
+        self.selected.pop(camera)
 
 
 class RaspberryPiCamera:
