@@ -12,8 +12,10 @@ from sanic_jwt.decorators import protected
 from sanic_cors import CORS, cross_origin
 from websockets.exceptions import ConnectionClosed
 
-from camera import Camera
+from camera import CameraManager, RaspberryPiCamera
 from user import User
+
+camera_manager = CameraManager([RaspberryPiCamera])
 
 
 users = [User(1, "user", "pass")]
@@ -57,7 +59,7 @@ async def camera(request):
     Get camera configs endpoint.
     """
 
-    with Camera() as camera:
+    with RaspberryPiCamera() as camera:
         response = json({
             "name": None,
             "model": [camera.model],  # send an array, should support several types
@@ -149,7 +151,7 @@ async def stream(request, ws):
     rotation = data["rotation"]
     quality = data["quality"]
 
-    camera = Camera(camera_name, resolution_id, rotation, quality)
+    camera = RaspberryPiCamera(camera_name, resolution_id, rotation, quality)
     try:
         while True:
             await asyncio.sleep(0.01)

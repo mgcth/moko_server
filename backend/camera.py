@@ -18,30 +18,34 @@ class CameraManager:
 
         """
         self.camera_classes = camera_classes
+        self.cameras = []
+        self.selected = None
 
     def scan(self):
         """
         Scan hardware for available cameras from defined calsses. Or rather,
         use the implemented camera classes to check if any camera is found. Let
         the user select which class to use if several find the same camera.
+        Class mush support contex managers.
         """
         for camera_class in self.camera_classes:
-            camera = camera_class()
-            camera.scan()
+            with camera_class as camera_instance:
+                if camera_instance.exist():
+                    self.cameras.append(camera_class)
 
     def select(self, camera):
         """
         Select an available camera, make that camera unavailable if set.
         """
-        pass
+        self.selected = self.cameras[camera]
+        # should I also create an instant of the object here, and destroy it in deselect?
 
     def deselect(self, camera):
         """
         Mark the selected camera as free again.
         """
-        pass
-
-
+        #self.selected.close()
+        self.selected = None
 
 
 class RaspberryPiCamera:
@@ -103,12 +107,18 @@ class RaspberryPiCamera:
         """
         self.camera.close()
 
+    def exist(self):
+        """
+        Scan to see if class can read hardware.
+        """
+        return True if not self._model() else False
+
     def _model(self):
         """
         Get the connected model from module.
         """
         module = self.camera.revision
-        model = self.settings.module.get(module, "none")
+        model = self.settings.module.get(module, None)
 
         return model
 
@@ -124,7 +134,7 @@ class RaspberryPiCamera:
         """
         Get available camera modes.
         """
-        modes = self.settings.modes.get(self._model(), "none")
+        modes = self.settings.modes.get(self._model(), None)
 
         return modes
 
