@@ -24,6 +24,8 @@ username_table = {u.username: u for u in users}
 userid_table = {u.user_id: u for u in users}
 
 async def authenticate(request, *args, **kwargs):
+    """
+    """
     username = request.json.get("username", None)
     password = request.json.get("password", None)
 
@@ -52,20 +54,45 @@ CORS(app)
 
 CAMERA_LIST_FILE = "../../camera_list.json"
 
+
+@app.route("/get-camera-backend")
+@protected()
+async def get_camera_backend(request):
+    """
+    Get camera backend options endpoint.
+    """
+    camera_manager.scan()
+    response = json(camera_manager.usable)
+        
+    return response
+
+@app.route("/set-camera-backend", methods=["POST"])
+@protected()
+async def set_camera_backend(request):
+    """
+    Get camera backend options endpoint.
+    """
+    camera = request.json
+    camera_manager.select(camera)
+        
+    return json({})
+
 @app.route("/camera-config")
 @protected()
-async def camera(request):
+async def camera_config(request):
     """
     Get camera configs endpoint.
     """
 
-    with RaspberryPiCamera() as camera:
+    with camera_manager.selected() as camera:
+        print(camera)
         response = json({
             "name": None,
             "model": [camera.model],  # send an array, should support several types
             "modes": camera.modes,  # this should be set by camera.model
             "save_folder": None
-            })
+        })
+        
         return response
 
 

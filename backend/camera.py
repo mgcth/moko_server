@@ -17,9 +17,9 @@ class CameraManager:
         """
 
         """
-        self.camera_classes = camera_classes
-        self.cameras = {}
-        self.selected = {}
+        self._backend = camera_classes
+        self._usable = None
+        self._selected = None
 
     def scan(self):
         """
@@ -28,25 +28,41 @@ class CameraManager:
         the user select which class to use if several find the same camera.
         Class mush support contex managers.
         """
-        for camera_class in self.camera_classes:
-            with camera_class as camera_instance:
+        camera_set = set()
+        for camera_class in self._backend:
+            with camera_class() as camera_instance:
                 if camera_instance.exist():
-                    self.cameras.append(camera_class)
+                    camera_set.add(camera_class)
+
+        self._usable = list(camera_set)
 
     def select(self, camera):
         """
         Select an available camera, make that camera unavailable if set.
         """
-        self.selected[camera] = self.cameras[camera]
-        # should I create an instant here, and destroy it in deselect?
+        self._selected = [usable for usable in self._usable if repr(usable()) == camera]
 
     def deselect(self, camera):
         """
         Mark the selected camera as free again.
         """
-        #self.selected[camera].close()
-        self.selected.pop(camera)
+        self._selected = None
 
+    @property
+    def usable(self):
+        """
+        Return usable camera backends as string.
+        """
+        print(repr(self._usable[0]))
+        return [repr(camera()) for camera in self._usable]
+    
+    @property
+    def selected(self):
+        """
+        Return ...
+        """
+        return self._selected
+    
 
 class RaspberryPiCamera:
     """
@@ -71,6 +87,7 @@ class RaspberryPiCamera:
             rotation: camera rotation
             quality: stream feed quality
         """
+        self._type = "PiCamera"
         self.name = name
         self.settings = CameraSettings()
         self.camera = PiCamera()
@@ -101,6 +118,18 @@ class RaspberryPiCamera:
         """
         self.close()
 
+    def __repr__(self):
+        """
+        Return object string representation.
+        """
+        return self._type
+
+    def __eq__(self, x):
+        """
+        Check object equality to a string x.
+        """
+        return x == self._type
+
     def close(self):
         """
         Close camera function.
@@ -111,7 +140,7 @@ class RaspberryPiCamera:
         """
         Scan to see if class can read hardware.
         """
-        return True if not self._model() else False
+        return True if self._model() else False
 
     def _model(self):
         """
