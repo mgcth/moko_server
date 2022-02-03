@@ -18,8 +18,8 @@ class CameraManager:
 
         """
         self.camera_classes = camera_classes
-        self.cameras = []
-        self.selected = []
+        self.cameras = {}
+        self.selected = {}
 
     def scan(self):
         """
@@ -37,7 +37,7 @@ class CameraManager:
         """
         Select an available camera, make that camera unavailable if set.
         """
-        self.selected.append(self.cameras[camera])
+        self.selected[camera] = self.cameras[camera]
         # should I create an instant here, and destroy it in deselect?
 
     def deselect(self, camera):
