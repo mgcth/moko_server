@@ -4,12 +4,14 @@ import { useLocation } from "react-router";
 import { Link, renderMatches } from 'react-router-dom';
 import styled from 'styled-components';
 import Select from 'react-select';
-import { useFetchGet } from "./Fetch.js"
+import { useFetchGet, Fetch } from "./Fetch.js"
 import {
   host,
   host_ws,
   host_stream,
   host_camera_config,
+  host_get_camera_backend,
+  host_set_camera_backend,
   host_read_cameras,
   host_save_camera
 } from "./Hosts.js"
@@ -69,6 +71,42 @@ function CameraName({ setCameraState }) {
         onChange={handleChange}
       >
       </input>
+    </div>
+  )
+}
+
+function CameraBackend({ setCameraState, server }) {
+  const headers = {
+    "Content-type": "application/json",
+    "Authorization": "Bearer " + server.token,
+  }
+  const { data, error } = useFetchGet(server.host + host_get_camera_backend, "GET", headers)
+
+  const [handleChange] = useState((e) => {
+    return (e) => {
+      setCameraState(cameraState => ({ ...cameraState, backend: e.value }))
+      console.log(e.value)
+
+      const deleteOptions = {
+        method: 'POST',
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + server.token,
+        },
+        body: JSON.stringify(e.value)
+      };
+
+      fetch(server.host + host_set_camera_backend, deleteOptions)
+    }
+  })
+
+  return (
+    <div>
+      <Label>Backend</Label>
+      <Select options={data.map(item => (
+        { label: item, value: item }
+      ))
+      } onChange={handleChange} />
     </div>
   )
 }
@@ -218,6 +256,7 @@ function CameraSettings({ setCameraState, server }) {
     <SettingsPane>
       <Label>Camera settings</Label>
       <CameraName setCameraState={setCameraState} />
+      <CameraBackend setCameraState={setCameraState} server={server} />
       <CameraModels setCameraState={setCameraState} server={server} />
       <CameraModes setCameraState={setCameraState} server={server} />
       <CameraQuality setCameraState={setCameraState} />
