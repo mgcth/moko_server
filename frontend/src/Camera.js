@@ -75,7 +75,7 @@ function CameraName({ setCameraState }) {
   )
 }
 
-function CameraBackend({ setCameraState, server }) {
+function CameraBackend({ setCameraState, server, setBackend }) {
   const headers = {
     "Content-type": "application/json",
     "Authorization": "Bearer " + server.token,
@@ -85,10 +85,9 @@ function CameraBackend({ setCameraState, server }) {
   const [handleChange] = useState((e) => {
     return (e) => {
       setCameraState(cameraState => ({ ...cameraState, backend: e.value }))
-      console.log(e.value)
 
-      const deleteOptions = {
-        method: 'POST',
+      const postOptions = {
+        method: "POST",
         headers: {
           "Content-type": "application/json",
           "Authorization": "Bearer " + server.token,
@@ -96,7 +95,9 @@ function CameraBackend({ setCameraState, server }) {
         body: JSON.stringify(e.value)
       };
 
-      fetch(server.host + host_set_camera_backend, deleteOptions)
+      fetch(server.host + host_set_camera_backend, postOptions)
+      .then(res => res.json())
+      .then(res => setBackend(res))
     }
   })
 
@@ -111,12 +112,21 @@ function CameraBackend({ setCameraState, server }) {
   )
 }
 
-function CameraModels({ setCameraState, server }) {
-  const headers = {
-    "Content-type": "application/json",
-    "Authorization": "Bearer " + server.token,
-  }
-  const { data, error } = useFetchGet(server.host + host_camera_config, "GET", headers)
+function CameraModels({ setCameraState, server, backend }) {
+  const [data, setData] = useState([])
+  const [error, setError] = useState()
+
+  useEffect(() => {
+    const postMessage = {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + server.token,
+      },
+    };
+
+    Fetch(server.host + host_camera_config, postMessage, setData, setError)
+  }, [backend])
 
   const [handleChange] = useState((e) => {
     return (e) => {
@@ -126,7 +136,8 @@ function CameraModels({ setCameraState, server }) {
 
   return (
     <div>
-      <Label>Model</Label>
+      <Label>Models</Label>
+      {console.log(data)}
       <Select options={"model" in data && data.model.map(item => (
         { label: item, value: item }
       ))
@@ -135,12 +146,22 @@ function CameraModels({ setCameraState, server }) {
   )
 }
 
-function CameraModes({ setCameraState, server }) {
-  const headers = {
-    "Content-type": "application/json",
-    "Authorization": "Bearer " + server.token,
-  }
-  const { data, error } = useFetchGet(server.host + host_camera_config, "GET", headers)
+function CameraModes({ setCameraState, server, backend }) {
+  const [data, setData] = useState([])
+  const [error, setError] = useState()
+
+  useEffect(() => {
+    console.log(backend)
+    const postMessage = {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + server.token,
+      },
+    };
+
+    Fetch(server.host + host_camera_config, postMessage, setData, setError)
+  }, [backend])
 
   const [handleChange] = useState((e) => {
     return (e) => {
@@ -151,6 +172,7 @@ function CameraModes({ setCameraState, server }) {
   return (
     <div>
       <Label>Modes</Label>
+      {console.log(data)}
       <Select options={"modes" in data &&
         data.modes.map(item => (
           {
@@ -252,13 +274,15 @@ function CameraSave({ cameraState, server }) {
 }
 
 function CameraSettings({ setCameraState, server }) {
+  const [backend, setBackend] = useState()
+
   return (
     <SettingsPane>
       <Label>Camera settings</Label>
       <CameraName setCameraState={setCameraState} />
-      <CameraBackend setCameraState={setCameraState} server={server} />
-      <CameraModels setCameraState={setCameraState} server={server} />
-      <CameraModes setCameraState={setCameraState} server={server} />
+      <CameraBackend setCameraState={setCameraState} server={server} setBackend={setBackend} />
+      <CameraModels setCameraState={setCameraState} server={server} backend={backend} />
+      <CameraModes setCameraState={setCameraState} server={server} backend={backend} />
       <CameraQuality setCameraState={setCameraState} />
       <CameraRotation setCameraState={setCameraState} />
       <CameraSaveFolder setCameraState={setCameraState} />
