@@ -40,7 +40,7 @@ class CameraManager:
         """
         Select an available camera, make that camera unavailable if set.
         """
-        self._selected = [usable for usable in self._usable if repr(usable()) == camera]
+        self._selected = [usable for usable in self._usable if repr(usable()) == camera][0]
 
     def deselect(self, camera):
         """
@@ -53,7 +53,6 @@ class CameraManager:
         """
         Return usable camera backends as string.
         """
-        print(repr(self._usable[0]))
         return [repr(camera()) for camera in self._usable]
     
     @property

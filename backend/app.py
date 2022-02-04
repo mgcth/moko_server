@@ -75,7 +75,7 @@ async def set_camera_backend(request):
     camera = request.json
     camera_manager.select(camera)
         
-    return json({})
+    return json(camera)
 
 @app.route("/camera-config")
 @protected()
@@ -83,18 +83,20 @@ async def camera_config(request):
     """
     Get camera configs endpoint.
     """
+    empty = json({"models": ["None"], "modes": ["None"]})
+
+    if camera_manager.selected == None:
+        return empty
 
     with camera_manager.selected() as camera:
-        print(camera)
         response = json({
-            "name": None,
             "model": [camera.model],  # send an array, should support several types
             "modes": camera.modes,  # this should be set by camera.model
-            "save_folder": None
         })
         
         return response
 
+    return empty
 
 @app.route("/read-camera")
 @protected()
