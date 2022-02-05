@@ -15,7 +15,7 @@ class CameraManager:
 
     def __init__(self, camera_classes=[]):
         """
-
+        Initialise the CameraManager class.
         """
         self._backend = camera_classes
         self._usable = None
@@ -58,7 +58,7 @@ class CameraManager:
     @property
     def selected(self):
         """
-        Return ...
+        Return the selected camera.
         """
         return self._selected
     
