@@ -42,7 +42,7 @@ class CameraManager:
         """
         self._selected = [usable for usable in self._usable if repr(usable()) == camera][0]
 
-    def deselect(self, camera):
+    def deselect(self):
         """
         Mark the selected camera as free again.
         """

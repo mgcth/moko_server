@@ -193,6 +193,7 @@ async def stream(request, ws):
         print("Closing connection.")
     finally:
         camera.close()
+        camera_manager.deselect()
 
 
 if __name__ == "__main__":
