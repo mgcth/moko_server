@@ -72,8 +72,8 @@ async def set_camera_backend(request):
     """
     Get camera backend options endpoint.
     """
-    camera = request.json
-    camera_manager.select(camera)
+    backend = request.json
+    camera_manager.select(backend)
         
     return json(camera)
 
@@ -96,19 +96,21 @@ async def camera_config(request):
         
         return response
 
-    return empty
-
 @app.route("/read-camera")
 @protected()
 async def read_camera(request):
     """
     Read available cameras endpoint.
     """
-
-    
     with open(CAMERA_LIST_FILE, "r") as file:  
         try:
-            response = json(loads(file.read()))
+            data = loads(file.read())
+            response = json(data)
+
+            camera_manager.scan()
+            for camera_name, camera in data.items():
+                camera_manager.select(camera["backend"])
+
             return response
         except:
             return json({})
@@ -120,7 +122,6 @@ async def save_camera(request):
     """
     Save camera (and write to cameras file) endpoint.
     """
-
     client_data = request.json
 
     with open(CAMERA_LIST_FILE, "r") as file:
@@ -144,7 +145,6 @@ async def delete_camera(request):
     """
     Delete camera (and write to cameras file) endpoint.
     """
-
     client_data = request.json
 
     with open(CAMERA_LIST_FILE, "r") as file:
@@ -168,7 +168,6 @@ async def stream(request, ws):
     """
     Websocket camera stream endpoint.
     """
-
     camera_name = await ws.recv()
 
     data = {}
@@ -180,7 +179,7 @@ async def stream(request, ws):
     rotation = data["rotation"]
     quality = data["quality"]
 
-    camera = RaspberryPiCamera(camera_name, resolution_id, rotation, quality)
+    camera = camera_manager.selected(camera_name, resolution_id, rotation, quality)
     try:
         while True:
             await asyncio.sleep(0.01)
