@@ -106,11 +106,6 @@ async def read_camera(request):
         try:
             data = loads(file.read())
             response = json(data)
-
-            camera_manager.scan()
-            for camera_name, camera in data.items():
-                camera_manager.select(camera["backend"])
-
             return response
         except:
             return json({})
@@ -174,6 +169,9 @@ async def stream(request, ws):
     with open(CAMERA_LIST_FILE, "r") as file:
         f = loads(file.read())
         data = f[camera_name]
+
+    camera_manager.scan()
+    camera_manager.select(data["backend"])
 
     resolution_id = data["mode"][0]
     rotation = data["rotation"]
