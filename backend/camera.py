@@ -48,6 +48,17 @@ class CameraManager:
         """
         self._selected = None
 
+    def start_recording(self, camera):
+        """
+        Start recording thread.
+        """
+        #
+
+    def stop_recording(self, camera):
+        """
+        """
+        #
+
     @property
     def usable(self):
         """
@@ -186,9 +197,11 @@ class RaspberryPiCamera:
         ):
             stream.seek(0)
             self._frame = stream.read()
-            yield self._frame
             stream.truncate()
             stream.seek(0)
+
+            yield self._frame
+            
 
     def save_frame(self, path):
         """
