@@ -48,16 +48,29 @@ class CameraManager:
         """
         self._selected = None
 
-    def start_recording(self, camera):
+    def start_straming(self, camera):
         """
-        Start recording thread.
+        Start straming process.
         """
-        #
+        pass
 
-    def stop_recording(self, camera):
+    def stop_straming(self, camera):
         """
+        Stop straming process.
         """
-        #
+        pass
+
+    def start_capture(self):
+        """
+        Start camera capture.
+        """
+        pass
+
+    def stop_capture(self):
+        """
+        Stop camera capture.
+        """
+        pass
 
     @property
     def usable(self):
@@ -202,7 +215,6 @@ class RaspberryPiCamera:
 
             yield self._frame
             
-
     def save_frame(self, path):
         """
         Save frame to path.
