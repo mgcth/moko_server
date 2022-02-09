@@ -1,8 +1,33 @@
 from PIL import Image
 from io import BytesIO
+import io
 from datetime import datetime
 from picamera import PiCamera, PiCameraCircularIO
 from camera_settings import CameraSettings
+
+
+class SplitFrames(object):
+    def __init__(self):
+        """
+
+        """
+        self.frame_num = 0
+        self.output = None
+
+    def write(self, buf):
+        """
+
+        """
+        if buf.startswith(b"\xff\xd8"):
+            if self.output:
+                self.output.close()
+
+            self.frame_num += 1
+            self.output = io.open("/home/pi/lv/image%02d.jpg" % self.frame_num, "wb")
+            print("HERE%02d" % self.frame_num)
+        print("HERE")
+
+        self.output.write(buf)
 
 
 class CameraManager:
@@ -60,17 +85,25 @@ class CameraManager:
         """
         pass
 
-    def start_capture(self):
+    def start_recording(self, camera):
         """
-        Start camera capture.
+        Start camera recording.
         """
-        pass
+        print(camera)
+        #camera.camera.start_preview()
+        stream = SplitFrames()
+        camera.camera.start_recording(stream, "mjpeg", quality=camera.quality)
+        #else:
+        #    print("No camera selected.")
 
-    def stop_capture(self):
+    def stop_recording(self):
         """
-        Stop camera capture.
+        Stop camera recording.
         """
-        pass
+        if self._selected:
+            self._selected.camera.stop_recording()
+        else:
+            print("No camera selected.")
 
     @property
     def usable(self):
@@ -122,6 +155,9 @@ class RaspberryPiCamera:
         self.resolution = self.settings.modes[model][resolution_id][1]
         self.camera.resolution = self.resolution
         self._frame = None
+
+        self.frame_num = 0
+        self.output = None
 
     def __del__(self):
         """
@@ -214,7 +250,12 @@ class RaspberryPiCamera:
             stream.seek(0)
 
             yield self._frame
-            
+
+    def record(self):
+        """
+        """
+        self.camera.start_recording(stream, "mjpeg", quality=self.quality)
+
     def save_frame(self, path):
         """
         Save frame to path.

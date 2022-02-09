@@ -157,8 +157,7 @@ async def delete_camera(request):
     return json({})
 
 
-@app.websocket("/stream")
-@protected(query_string_set=True)
+@app.websocket("/stream")#@protected(query_string_set=True)
 async def stream(request, ws):
     """
     Websocket camera stream endpoint.
@@ -178,22 +177,27 @@ async def stream(request, ws):
     quality = data["quality"]
 
     camera = camera_manager.selected(camera_name, resolution_id, rotation, quality)
-    try:
-        while True:
-            await asyncio.sleep(0.01)
-            frame = next(camera.next_frame())
-            #print(sys.getsizeof(frame))
-            await ws.send(
-               f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
-            )
-            camera.save_frame(data["save_folder"])
 
-    except Exception as e:
-        print(e)
-        print("Closing connection.")
-    finally:
-        camera.close()
-        camera_manager.deselect()
+    camera_manager.start_recording(camera)
+    camera.camera.wait_recording(5)
+    # try:
+    #     while True:
+    #         await asyncio.sleep(0.01)
+
+    #         start_recording()
+    #         frame = next(camera.next_frame())
+    #         #print(sys.getsizeof(frame))
+    #         await ws.send(
+    #            f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
+    #         )
+    #         camera.save_frame(data["save_folder"])
+
+    # except Exception as e:
+    #     print(e)
+    #     print("Closing connection.")
+    # finally:
+    #     camera.close()
+    #     camera_manager.deselect()
 
 
 if __name__ == "__main__":
