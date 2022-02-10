@@ -175,11 +175,12 @@ async def stream(request, ws):
     resolution_id = data["mode"][0]
     rotation = data["rotation"]
     quality = data["quality"]
+    path = data["save_folder"]
 
-    camera = camera_manager.selected(camera_name, resolution_id, rotation, quality)
+    camera_manager.camera = camera_manager.selected(path, camera_name, resolution_id, rotation, quality)
 
-    camera_manager.start_recording(camera)
-    camera.camera.wait_recording(5)
+    camera_manager.start_recording()
+    #camera.camera.wait_recording(5)
     # try:
     #     while True:
     #         await asyncio.sleep(0.01)

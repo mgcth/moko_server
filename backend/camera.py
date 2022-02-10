@@ -1,18 +1,31 @@
+import io
 from PIL import Image
 from io import BytesIO
-import io
+from threading import Thread
 from datetime import datetime
 from picamera import PiCamera, PiCameraCircularIO
 from camera_settings import CameraSettings
 
 
-class SplitFrames(object):
-    def __init__(self):
+def record(camera):
+    if camera:
+        stream = SplitFrames(camera.path)
+        camera.camera.start_recording(stream, "mjpeg", quality=camera.quality)
+        print("Record thread started.")
+    else:
+        print("No camera selected.")
+
+
+class SplitFrames:
+    def __init__(self, path, fps=1):
         """
 
         """
-        self.frame_num = 0
         self.output = None
+        self.timestamp = None
+        self.frame_num = 0
+        self.fps = fps
+        self.path = path
 
     def write(self, buf):
         """
@@ -22,10 +35,21 @@ class SplitFrames(object):
             if self.output:
                 self.output.close()
 
-            self.frame_num += 1
-            self.output = io.open("/home/pi/lv/image%02d.jpg" % self.frame_num, "wb")
-            print("HERE%02d" % self.frame_num)
-        print("HERE")
+            date = datetime.now().strftime("%Y%m%d%G%M%S")
+            if self.timestamp != date:
+                self.timestamp = date
+                self.frame_num = 0
+            else:
+                self.frame_num += 1
+            
+            self.output = io.open(
+                "{0}/image{1}_{2}.jpg".format(
+                    self.path,
+                    self.timestamp,
+                    self.frame_num),
+                "wb"
+            )
+            print("Saved{0}".format(self.timestamp))
 
         self.output.write(buf)
 
@@ -45,6 +69,8 @@ class CameraManager:
         self._backend = camera_classes
         self._usable = None
         self._selected = None
+        self.camera = None
+        self._record_thread = None
 
     def scan(self):
         """
@@ -85,16 +111,12 @@ class CameraManager:
         """
         pass
 
-    def start_recording(self, camera):
+    def start_recording(self):
         """
         Start camera recording.
         """
-        print(camera)
-        #camera.camera.start_preview()
-        stream = SplitFrames()
-        camera.camera.start_recording(stream, "mjpeg", quality=camera.quality)
-        #else:
-        #    print("No camera selected.")
+        self._record_thread = Thread(target = record, args = (self.camera, ))
+        self._record_thread.start()
 
     def stop_recording(self):
         """
@@ -102,6 +124,7 @@ class CameraManager:
         """
         if self._selected:
             self._selected.camera.stop_recording()
+            self._record_thread.join()
         else:
             print("No camera selected.")
 
@@ -128,6 +151,7 @@ class RaspberryPiCamera:
 
     def __init__(
         self,
+        path=None,
         name="A camera has no name",
         resolution_id=1,
         rotation=0,
@@ -144,6 +168,7 @@ class RaspberryPiCamera:
             quality: stream feed quality
         """
         self._type = "PiCamera"
+        self.path = path
         self.name = name
         self.settings = CameraSettings()
         self.camera = PiCamera()
