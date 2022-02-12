@@ -112,7 +112,7 @@ function CameraBackend({ setCameraState, server, setBackend }) {
   )
 }
 
-function CameraModels({ setCameraState, server, backend }) {
+function CameraModel({ setCameraState, server, backend }) {
   const [data, setData] = useState([])
   const [error, setError] = useState()
 
@@ -136,7 +136,7 @@ function CameraModels({ setCameraState, server, backend }) {
 
   return (
     <div>
-      <Label>Models</Label>
+      <Label>Model</Label>
       {console.log(data)}
       <Select options={"model" in data && data.model.map(item => (
         { label: item, value: item }
@@ -181,6 +181,33 @@ function CameraModes({ setCameraState, server, backend }) {
           }
         ))
       } onChange={handleChange} />
+    </div>
+  )
+}
+
+function CameraFPS({ setCameraState }) {
+  const [handleChange] = useState((e) => {
+    return (e) => {
+      let value = 10
+      if (1 <= e.target.value <= 100) {
+        value = e.target.value
+      }
+      setCameraState(cameraState => ({ ...cameraState, fps: parseFloat(value, 10) }))
+    }
+  })
+
+  return (
+    <div>
+      <Label>Frames per second</Label>
+      <input
+        type="number"
+        className="form-control"
+        placeholder="Dynamic value set by camera mode"
+        min={1}
+        max={100}
+        onChange={handleChange}
+      >
+      </input>
     </div>
   )
 }
@@ -281,8 +308,9 @@ function CameraSettings({ setCameraState, server }) {
       <Label>Camera settings</Label>
       <CameraName setCameraState={setCameraState} />
       <CameraBackend setCameraState={setCameraState} server={server} setBackend={setBackend} />
-      <CameraModels setCameraState={setCameraState} server={server} backend={backend} />
+      <CameraModel setCameraState={setCameraState} server={server} backend={backend} />
       <CameraModes setCameraState={setCameraState} server={server} backend={backend} />
+      <CameraFPS setCameraState={setCameraState} />
       <CameraQuality setCameraState={setCameraState} />
       <CameraRotation setCameraState={setCameraState} />
       <CameraSaveFolder setCameraState={setCameraState} />
