@@ -112,7 +112,7 @@ function CameraBackend({ setCameraState, server, setBackend }) {
   )
 }
 
-function CameraModel({ setCameraState, server, backend }) {
+function CameraModel({ setCameraState, setModel, server, backend }) {
   const [data, setData] = useState([])
   const [error, setError] = useState()
 
@@ -131,14 +131,14 @@ function CameraModel({ setCameraState, server, backend }) {
   const [handleChange] = useState((e) => {
     return (e) => {
       setCameraState(cameraState => ({ ...cameraState, model: e.value }))
+      setModel(e.value)
     }
   })
 
   return (
     <div>
       <Label>Model</Label>
-      {console.log(data)}
-      <Select options={"model" in data && data.model.map(item => (
+      <Select options={backend && "model" in data && data.model.map(item => (
         { label: item, value: item }
       ))
       } onChange={handleChange} />
@@ -146,7 +146,7 @@ function CameraModel({ setCameraState, server, backend }) {
   )
 }
 
-function CameraModes({ setCameraState, setMode, server, backend }) {
+function CameraModes({ setCameraState, setMode, model, server, backend }) {
   const [data, setData] = useState([])
   const [error, setError] = useState()
 
@@ -172,8 +172,7 @@ function CameraModes({ setCameraState, setMode, server, backend }) {
   return (
     <div>
       <Label>Modes</Label>
-      {console.log(data)}
-      <Select options={"modes" in data &&
+      <Select options={model && "modes" in data &&
         data.modes.map(item => (
           {
             value: item,
@@ -315,6 +314,7 @@ function CameraSave({ cameraState, server }) {
 
 function CameraSettings({ setCameraState, server }) {
   const [backend, setBackend] = useState()
+  const [model, setModel] = useState()
   const [mode, setMode] = useState()
 
   return (
@@ -322,8 +322,8 @@ function CameraSettings({ setCameraState, server }) {
       <Label>Camera settings</Label>
       <CameraName setCameraState={setCameraState} />
       <CameraBackend setCameraState={setCameraState} server={server} setBackend={setBackend} />
-      <CameraModel setCameraState={setCameraState} server={server} backend={backend} />
-      <CameraModes setCameraState={setCameraState} setMode={setMode} server={server} backend={backend} />
+      <CameraModel setCameraState={setCameraState} setModel={setModel} server={server} backend={backend} />
+      <CameraModes setCameraState={setCameraState} setMode={setMode} model={model} server={server} backend={backend} />
       <CameraFPS setCameraState={setCameraState} mode={mode} />
       <CameraQuality setCameraState={setCameraState} />
       <CameraRotation setCameraState={setCameraState} />
@@ -335,6 +335,7 @@ function CameraSettings({ setCameraState, server }) {
 function AddCamera(props) {
   const [cameraState, setCameraState] = useState([])
   const server = useLocation().state
+  console.log(cameraState)
 
   return (
     <Section>
