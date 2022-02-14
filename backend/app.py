@@ -75,7 +75,7 @@ async def set_camera_backend(request):
     backend = request.json
     camera_manager.select(backend)
         
-    return json(camera)
+    return json({backend})
 
 @app.route("/camera-config")
 @protected()
@@ -177,7 +177,7 @@ async def stream(request, ws):
     quality = data["quality"]
     path = data["save_folder"]
 
-    camera_manager.camera = camera_manager.selected(path, camera_name, resolution_id, rotation, quality)
+    camera_manager.camera = camera_manager.selected(path, camera_name, resolution_id, rotation, quality, 30)
 
     camera_manager.start_recording()
     #camera.camera.wait_recording(5)
