@@ -146,12 +146,11 @@ function CameraModel({ setCameraState, server, backend }) {
   )
 }
 
-function CameraModes({ setCameraState, server, backend }) {
+function CameraModes({ setCameraState, setMode, server, backend }) {
   const [data, setData] = useState([])
   const [error, setError] = useState()
 
   useEffect(() => {
-    console.log(backend)
     const postMessage = {
       method: "GET",
       headers: {
@@ -166,6 +165,7 @@ function CameraModes({ setCameraState, server, backend }) {
   const [handleChange] = useState((e) => {
     return (e) => {
       setCameraState(cameraState => ({ ...cameraState, mode: e.value }))
+      setMode(e.value)
     }
   })
 
@@ -185,14 +185,25 @@ function CameraModes({ setCameraState, server, backend }) {
   )
 }
 
-function CameraFPS({ setCameraState }) {
+function CameraFPS({ mode, setCameraState }) {
+  const [minFPS, setMinFPS] = useState(1)
+  const [maxFPS, setMaxFPS] = useState(2)
+
+  useEffect(() => {
+    if (mode) {
+      setMinFPS(mode[2][0])
+      setMaxFPS(mode[2][1])
+    }
+  }, [mode])
+
   const [handleChange] = useState((e) => {
+    let default_value = 1
     return (e) => {
-      let value = 10
-      if (1 <= e.target.value <= 100) {
-        value = e.target.value
+      const value = parseFloat(e.target.value, 10)
+      if (minFPS <= value <= maxFPS) {
+        default_value = value
       }
-      setCameraState(cameraState => ({ ...cameraState, fps: parseFloat(value, 10) }))
+      setCameraState(cameraState => ({ ...cameraState, fps: default_value }))
     }
   })
 
@@ -202,9 +213,10 @@ function CameraFPS({ setCameraState }) {
       <input
         type="number"
         className="form-control"
-        placeholder="Dynamic value set by camera mode"
-        min={1}
-        max={100}
+        placeholder={`Dynamic value set by camera mode (${minFPS}, ${maxFPS})`}
+        min={minFPS}
+        max={maxFPS}
+        step={0.1}
         onChange={handleChange}
       >
       </input>
@@ -232,6 +244,7 @@ function CameraQuality({ setCameraState }) {
         placeholder="JPEG quality, default 10, value between 1-100"
         min={1}
         max={100}
+        step={1}
         onChange={handleChange}
       >
       </input>
@@ -302,6 +315,7 @@ function CameraSave({ cameraState, server }) {
 
 function CameraSettings({ setCameraState, server }) {
   const [backend, setBackend] = useState()
+  const [mode, setMode] = useState()
 
   return (
     <SettingsPane>
@@ -309,8 +323,8 @@ function CameraSettings({ setCameraState, server }) {
       <CameraName setCameraState={setCameraState} />
       <CameraBackend setCameraState={setCameraState} server={server} setBackend={setBackend} />
       <CameraModel setCameraState={setCameraState} server={server} backend={backend} />
-      <CameraModes setCameraState={setCameraState} server={server} backend={backend} />
-      <CameraFPS setCameraState={setCameraState} />
+      <CameraModes setCameraState={setCameraState} setMode={setMode} server={server} backend={backend} />
+      <CameraFPS setCameraState={setCameraState} mode={mode} />
       <CameraQuality setCameraState={setCameraState} />
       <CameraRotation setCameraState={setCameraState} />
       <CameraSaveFolder setCameraState={setCameraState} />
