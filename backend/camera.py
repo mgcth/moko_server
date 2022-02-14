@@ -10,21 +10,20 @@ from camera_settings import CameraSettings
 def record(camera):
     if camera:
         stream = SplitFrames(camera.path)
-        camera.camera.start_recording(stream, "mjpeg", quality=camera.quality)
+        camera.camera.start_recording(stream, "mjpeg", quality=100)
         print("Record thread started.")
     else:
         print("No camera selected.")
 
 
 class SplitFrames:
-    def __init__(self, path, fps=1):
+    def __init__(self, path):
         """
 
         """
         self.output = None
         self.timestamp = None
         self.frame_num = 0
-        self.fps = fps
         self.path = path
 
     def write(self, buf):
@@ -35,12 +34,7 @@ class SplitFrames:
             if self.output:
                 self.output.close()
 
-            date = datetime.now().strftime("%Y%m%d%G%M%S")
-            if self.timestamp != date:
-                self.timestamp = date
-                self.frame_num = 0
-            else:
-                self.frame_num += 1
+            self.update_time()
             
             self.output = io.open(
                 "{0}/image{1}_{2}.jpg".format(
@@ -49,9 +43,16 @@ class SplitFrames:
                     self.frame_num),
                 "wb"
             )
-            print("Saved{0}".format(self.timestamp))
 
         self.output.write(buf)
+
+    def update_time(self):
+        date = datetime.now().strftime("%Y%m%d%G%M%S")
+        if self.timestamp != date:
+            self.timestamp = date
+            self.frame_num = 0
+        else:
+            self.frame_num += 1
 
 
 class CameraManager:
@@ -155,7 +156,8 @@ class RaspberryPiCamera:
         name="A camera has no name",
         resolution_id=1,
         rotation=0,
-        quality=10
+        quality=10,
+        framerate=10
     ):
         """
         Initialise the camera with a name, resolution (mode), rotation and stream
@@ -175,6 +177,7 @@ class RaspberryPiCamera:
 
         self.camera.rotation = rotation
         self.quality = quality
+        self.camera.framerate = framerate
 
         model = self._model()
         self.resolution = self.settings.modes[model][resolution_id][1]
