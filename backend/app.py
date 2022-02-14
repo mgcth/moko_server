@@ -75,7 +75,7 @@ async def set_camera_backend(request):
     backend = request.json
     camera_manager.select(backend)
         
-    return json({backend})
+    return json(backend)
 
 @app.route("/camera-config")
 @protected()
