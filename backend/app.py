@@ -199,31 +199,21 @@ async def stream(request, ws):
     """
     camera_name = await ws.recv()
 
-    data = {}
-    with open(CAMERA_LIST_FILE, "r") as file:
-        f = loads(file.read())
-        data = f[camera_name]
-
-
-    camera.camera.wait_recording(5)
     try:
         while True:
             await asyncio.sleep(0.01)
 
-            start_recording()
-            frame = next(camera.next_frame())
-            #print(sys.getsizeof(frame))
+            frame = stream_frame_queue.get().read()
             await ws.send(
                f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
             )
-            camera.save_frame(data["save_folder"])
 
     except Exception as e:
         print(e)
         print("Closing connection.")
-    finally:
-        camera.close()
-        camera_manager.deselect()
+    # finally:
+    #     camera.close()
+    #     camera_manager.deselect()
 
 
 if __name__ == "__main__":
