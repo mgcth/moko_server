@@ -1,4 +1,5 @@
 import io
+import time
 import queue
 from PIL import Image
 from io import BytesIO
@@ -11,13 +12,27 @@ save_frame_queue = queue.Queue(25)
 stream_frame_queue = queue.Queue()
 
 def record(camera):
+    print("Record thread started.")
     if camera:
-        save_stream = SplitFrames(camera.path, camera.stream_resolution)
-        camera.camera.start_recording(save_stream, "mjpeg", quality=100)
+        try:
+            save_stream = SplitFrames(camera.path)
+            camera.camera.start_recording(save_stream, "mjpeg", quality=100)
 
-        stream = Stream()
-        camera.camera.start_recording(stream, "mjpeg", quality=camera.quality, splitter_port=2)
-        print("Record thread started.")
+            stream = Stream()
+            camera.camera.start_recording(
+                stream,
+                "mjpeg",
+                quality=camera.quality,
+                resize=camera.stream_resolution,
+                splitter_port=2
+            )
+
+            while True:
+                camera.camera.wait_recording(1)
+        finally:
+            camera.camera.stop_recording(splitter_port=2)
+            camera.camera.stop_recording()
+            print("Record stopped.")
     else:
         print("No camera selected.")
 
@@ -32,21 +47,11 @@ class Stream():
         """
         """
         if buf.startswith(b"\xff\xd8"):
-            stream_frame_queue.put(BytesIO(stream))
-
-    def resize(self, frame):
-        """
-        Resize image for streaming.
-        """
-        image = Image.open(frame)
-        image = image.resize(self.resolution, Image.ANTIALIAS)
-        output = BytesIO()
-        image.save(output, format="JPEG", optimize=True)
-        stream_frame_queue.put(output)
+            stream_frame_queue.put(BytesIO(buf))
 
 
 class SplitFrames:
-    def __init__(self, path, resolution):
+    def __init__(self, path):
         """
 
         """
@@ -54,7 +59,6 @@ class SplitFrames:
         self.timestamp = None
         self.frame_num = 0
         self.path = path
-        self.resolution = resolution
 
     def write(self, buf):
         """
@@ -68,15 +72,14 @@ class SplitFrames:
                 self.timestamp,
                 self.frame_num
             )
-            frame = BytesIO(buf)
 
-            if save_frame_queue.full() == False:
-                self.save_frame_queue.put((frame, file))
-            else:
+            if save_frame_queue.full() == True:
                 for (frame, file) in iter(save_frame_queue.get, None):
-                    self.output = io.open(file)
-                    self.output.write(frame)
-                    self.output.close()
+                    output = io.open(file, "wb")
+                    output.write(frame)
+                    output.close()
+
+            save_frame_queue.put((buf, file))
 
     def update_time(self):
         """
