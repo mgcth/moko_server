@@ -1,4 +1,5 @@
 import io
+import queue
 from PIL import Image
 from io import BytesIO
 from threading import Thread
@@ -6,47 +7,81 @@ from datetime import datetime
 from picamera import PiCamera, PiCameraCircularIO
 from camera_settings import CameraSettings
 
+save_frame_queue = queue.Queue(25)
+stream_frame_queue = queue.Queue()
 
-def record(camera, path):
+def record(camera):
     if camera:
-        stream = SplitFrames(path)
-        camera.start_recording(stream, "mjpeg", quality=100)
+        save_stream = SplitFrames(camera.path, camera.stream_resolution)
+        camera.camera.start_recording(save_stream, "mjpeg", quality=100)
+
+        stream = Stream()
+        camera.camera.start_recording(stream, "mjpeg", quality=camera.quality, splitter_port=2)
         print("Record thread started.")
     else:
         print("No camera selected.")
 
 
-class SplitFrames:
-    def __init__(self, path):
+class Stream():
+    def __init__(self):
         """
-
         """
-        self.output = None
-        self.timestamp = None
-        self.frame_num = 0
-        self.path = path
+        pass
 
     def write(self, buf):
         """
-
         """
         if buf.startswith(b"\xff\xd8"):
-            if self.output:
-                self.output.close()
+            stream_frame_queue.put(BytesIO(stream))
 
+    def resize(self, frame):
+        """
+        Resize image for streaming.
+        """
+        image = Image.open(frame)
+        image = image.resize(self.resolution, Image.ANTIALIAS)
+        output = BytesIO()
+        image.save(output, format="JPEG", optimize=True)
+        stream_frame_queue.put(output)
+
+
+class SplitFrames:
+    def __init__(self, path, resolution):
+        """
+
+        """
+        # self.output = None
+        self.timestamp = None
+        self.frame_num = 0
+        self.path = path
+        self.resolution = resolution
+
+    def write(self, buf):
+        """
+        Write frame to buffer, or queue.
+        """
+        if buf.startswith(b"\xff\xd8"):
             self.update_time()
             
-            self.output = io.open(
-                "{0}/image{1}_{2}.jpg".format(
-                    self.path,
-                    self.timestamp,
-                    self.frame_num),
-                "wb"
+            file = "{0}/image{1}_{2}.jpg".format(
+                self.path,
+                self.timestamp,
+                self.frame_num
             )
+            frame = BytesIO(buf)
 
-        self.output.write(buf)
+            if save_frame_queue.full() == False:
+                self.save_frame_queue.put((frame, file))
+            else:
+                for (frame, file) in iter(save_frame_queue.get, None):
+                    self.output = io.open(file)
+                    self.output.write(frame)
+                    self.output.close()
 
     def update_time(self):
+        """
+        Update timestamp.
+        """
         date = datetime.now().strftime("%Y%m%d%G%M%S")
         if self.timestamp != date:
             self.timestamp = date
@@ -116,7 +151,7 @@ class CameraManager:
         """
         Start camera recording.
         """
-        self._record_thread = Thread(target = record, args = (self._selected.camera, self._selected.path))
+        self._record_thread = Thread(target = record, args = (self.camera, ))
         self._record_thread.start()
 
     def stop_recording(self):
@@ -182,6 +217,7 @@ class RaspberryPiCamera:
         model = self._model()
         self.resolution = self.settings.modes[model][resolution_id][1]
         self.camera.resolution = self.resolution
+        self.stream_resolution = (800, 400)
         self._frame = None
 
         self.frame_num = 0

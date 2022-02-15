@@ -12,7 +12,7 @@ from sanic_jwt.decorators import protected
 from sanic_cors import CORS, cross_origin
 from websockets.exceptions import ConnectionClosed
 
-from camera import CameraManager, RaspberryPiCamera
+from camera import CameraManager, RaspberryPiCamera, stream_frame_queue
 from user import User
 
 camera_manager = CameraManager([RaspberryPiCamera])
@@ -55,6 +55,28 @@ CORS(app)
 CAMERA_LIST_FILE = "../../camera_list.json"
 
 
+def startup():
+    print("Starting cameras.")
+    camera_manager.scan()
+
+    with open(CAMERA_LIST_FILE, "r") as file:
+        try:
+            data = loads(file.read())
+            for camera_name, data in data.items():
+
+                camera_manager.select(data["backend"])
+                resolution_id = data["mode"][0]
+                rotation = data["rotation"]
+                quality = data["quality"]
+                path = data["save_folder"]
+                fps = data["fps"]
+                camera_manager.camera = camera_manager.selected(path, camera_name, resolution_id, rotation, quality, fps)
+                camera_manager.start_recording()
+        except:
+            print("No camera configured.")
+
+startup()
+
 @app.route("/get-camera-backend")
 @protected()
 async def get_camera_backend(request):
@@ -66,6 +88,7 @@ async def get_camera_backend(request):
         
     return response
 
+
 @app.route("/set-camera-backend", methods=["POST"])
 @protected()
 async def set_camera_backend(request):
@@ -76,6 +99,7 @@ async def set_camera_backend(request):
     camera_manager.select(backend)
         
     return json(backend)
+
 
 @app.route("/camera-config")
 @protected()
@@ -95,6 +119,7 @@ async def camera_config(request):
         })
         
         return response
+
 
 @app.route("/read-camera")
 @protected()
@@ -118,6 +143,7 @@ async def save_camera(request):
     Save camera (and write to cameras file) endpoint.
     """
     client_data = request.json
+    camera_name = client_data["name"]
 
     with open(CAMERA_LIST_FILE, "r") as file:
         try:
@@ -127,9 +153,17 @@ async def save_camera(request):
 
     with open(CAMERA_LIST_FILE, "w", encoding="utf-8") as file:
         if client_data is not None:
-            data[client_data["name"]] = client_data
+            data[camera_name] = client_data
         
         file.write(dumps(data))
+
+    resolution_id = data[camera_name]["mode"][0]
+    rotation = data[camera_name]["rotation"]
+    quality = data[camera_name]["quality"]
+    path = data[camera_name]["save_folder"]
+    fps = data[camera_name]["fps"]
+    camera_manager.camera = camera_manager.selected(path, camera_name, resolution_id, rotation, quality, fps)
+    camera_manager.start_recording()
 
     return json({})
 
@@ -157,7 +191,8 @@ async def delete_camera(request):
     return json({})
 
 
-@app.websocket("/stream")#@protected(query_string_set=True)
+@app.websocket("/stream")
+@protected(query_string_set=True)
 async def stream(request, ws):
     """
     Websocket camera stream endpoint.
@@ -169,36 +204,26 @@ async def stream(request, ws):
         f = loads(file.read())
         data = f[camera_name]
 
-    camera_manager.scan()
-    camera_manager.select(data["backend"])
 
-    resolution_id = data["mode"][0]
-    rotation = data["rotation"]
-    quality = data["quality"]
-    path = data["save_folder"]
+    camera.camera.wait_recording(5)
+    try:
+        while True:
+            await asyncio.sleep(0.01)
 
-    camera_manager.camera = camera_manager.selected(path, camera_name, resolution_id, rotation, quality, 30)
+            start_recording()
+            frame = next(camera.next_frame())
+            #print(sys.getsizeof(frame))
+            await ws.send(
+               f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
+            )
+            camera.save_frame(data["save_folder"])
 
-    camera_manager.start_recording()
-    #camera.camera.wait_recording(5)
-    # try:
-    #     while True:
-    #         await asyncio.sleep(0.01)
-
-    #         start_recording()
-    #         frame = next(camera.next_frame())
-    #         #print(sys.getsizeof(frame))
-    #         await ws.send(
-    #            f"data:image/jpeg;base64, {base64.b64encode(frame).decode()}"
-    #         )
-    #         camera.save_frame(data["save_folder"])
-
-    # except Exception as e:
-    #     print(e)
-    #     print("Closing connection.")
-    # finally:
-    #     camera.close()
-    #     camera_manager.deselect()
+    except Exception as e:
+        print(e)
+        print("Closing connection.")
+    finally:
+        camera.close()
+        camera_manager.deselect()
 
 
 if __name__ == "__main__":
