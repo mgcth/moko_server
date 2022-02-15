@@ -7,10 +7,10 @@ from picamera import PiCamera, PiCameraCircularIO
 from camera_settings import CameraSettings
 
 
-def record(camera):
+def record(camera, path):
     if camera:
-        stream = SplitFrames(camera.path)
-        camera.camera.start_recording(stream, "mjpeg", quality=100)
+        stream = SplitFrames(path)
+        camera.start_recording(stream, "mjpeg", quality=100)
         print("Record thread started.")
     else:
         print("No camera selected.")
@@ -116,7 +116,7 @@ class CameraManager:
         """
         Start camera recording.
         """
-        self._record_thread = Thread(target = record, args = (self.camera, ))
+        self._record_thread = Thread(target = record, args = (self._selected.camera, self._selected.path))
         self._record_thread.start()
 
     def stop_recording(self):
