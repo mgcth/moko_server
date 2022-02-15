@@ -240,7 +240,7 @@ function CameraQuality({ setCameraState }) {
       <input
         type="number"
         className="form-control"
-        placeholder="JPEG quality, default 10, value between 1-100"
+        placeholder="Stream JPEG quality, default 10, value between 1-100"
         min={1}
         max={100}
         step={1}
