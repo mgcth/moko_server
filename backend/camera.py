@@ -12,12 +12,31 @@ save_frame_queue = queue.Queue(25)
 stream_frame_queue = queue.Queue()
 
 def record(camera):
+    """
+    Record thread.
+    """
     print("Record thread started.")
     if camera:
         try:
             save_stream = SplitFrames(camera.path)
             camera.camera.start_recording(save_stream, "mjpeg", quality=100)
 
+            while True:
+                camera.camera.wait_recording(1)
+        finally:
+            camera.camera.stop_recording()
+            print("Record stopped.")
+    else:
+        print("No camera selected.")
+
+
+def stream(camera):
+    """
+    Stream thread.
+    """
+    print("Stream thread started.")
+    if camera:
+        try:
             stream = Stream()
             camera.camera.start_recording(
                 stream,
@@ -31,8 +50,7 @@ def record(camera):
                 camera.camera.wait_recording(1)
         finally:
             camera.camera.stop_recording(splitter_port=2)
-            camera.camera.stop_recording()
-            print("Record stopped.")
+            print("Stream stopped.")
     else:
         print("No camera selected.")
 
@@ -138,17 +156,21 @@ class CameraManager:
         """
         self._selected = None
 
-    def start_straming(self, camera):
+    def start_streaming(self):
         """
         Start straming process.
         """
-        pass
+        self._stream_thread = Thread(target = stream, args = (self.camera, ))
+        self._stream_thread.start()
 
-    def stop_straming(self, camera):
+    def stop_streaming(self):
         """
         Stop straming process.
         """
-        pass
+        if self._selected:
+            self._stream_thread.join()
+        else:
+            print("No camera selected.")
 
     def start_recording(self):
         """
@@ -162,7 +184,6 @@ class CameraManager:
         Stop camera recording.
         """
         if self._selected:
-            self._selected.camera.stop_recording()
             self._record_thread.join()
         else:
             print("No camera selected.")

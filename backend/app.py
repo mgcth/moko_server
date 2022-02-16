@@ -199,6 +199,7 @@ async def stream(request, ws):
     """
     camera_name = await ws.recv()
 
+    camera_manager.start_streaming()
     try:
         while True:
             await asyncio.sleep(0.01)
@@ -211,9 +212,9 @@ async def stream(request, ws):
     except Exception as e:
         print(e)
         print("Closing connection.")
-    # finally:
-    #     camera.close()
-    #     camera_manager.deselect()
+    finally:
+        print("Stopping streaming.")
+        camera_manager.stop_streaming()
 
 
 if __name__ == "__main__":
