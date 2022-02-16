@@ -10,6 +10,8 @@ from camera_settings import CameraSettings
 
 save_frame_queue = queue.Queue(25)
 stream_frame_queue = queue.Queue()
+do_record = True
+do_stream = True
 
 def record(camera):
     """
@@ -21,7 +23,7 @@ def record(camera):
             save_stream = SplitFrames(camera.path)
             camera.camera.start_recording(save_stream, "mjpeg", quality=100)
 
-            while True:
+            while do_record == True:
                 camera.camera.wait_recording(1)
         finally:
             camera.camera.stop_recording()
@@ -46,7 +48,7 @@ def stream(camera):
                 splitter_port=2
             )
 
-            while True:
+            while do_stream == True:
                 camera.camera.wait_recording(1)
         finally:
             camera.camera.stop_recording(splitter_port=2)
@@ -168,7 +170,9 @@ class CameraManager:
         Stop straming process.
         """
         if self._selected:
+            do_stream = False
             self._stream_thread.join()
+            do_stream = True
         else:
             print("No camera selected.")
 
@@ -184,7 +188,9 @@ class CameraManager:
         Stop camera recording.
         """
         if self._selected:
+            do_record = False
             self._record_thread.join()
+            do_record = True
         else:
             print("No camera selected.")
 
