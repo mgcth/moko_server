@@ -167,6 +167,7 @@ class CameraManager:
         Start straming process.
         """
         self._stream_thread = Thread(target = stream, args = (self.camera, stream_frame_queue, stream_queue, ))
+        self._stream_thread.daemon = True
         self._stream_thread.start()
 
     def stop_streaming(self):
@@ -185,6 +186,7 @@ class CameraManager:
         Start camera recording.
         """
         self._record_thread = Thread(target = record, args = (self.camera, save_frame_queue, record_queue, ))
+        self._record_thread.daemon = True
         self._record_thread.start()
 
     def stop_recording(self):
