@@ -10,10 +10,11 @@ from camera_settings import CameraSettings
 
 save_frame_queue = queue.Queue(25)
 stream_frame_queue = queue.Queue()
-do_record = True
-do_stream = True
 
-def record(camera):
+stream_queue = queue.Queue()
+record_queue = queue.Queue()
+
+def record(camera, save_frame_queue, stream_queue):
     """
     Record thread.
     """
@@ -23,7 +24,7 @@ def record(camera):
             save_stream = SplitFrames(camera.path)
             camera.camera.start_recording(save_stream, "mjpeg", quality=100)
 
-            while do_record == True:
+            while record_queue.empty():
                 camera.camera.wait_recording(1)
         finally:
             camera.camera.stop_recording()
@@ -32,7 +33,7 @@ def record(camera):
         print("No camera selected.")
 
 
-def stream(camera):
+def stream(camera, stream_frame_queue, stream_queue):
     """
     Stream thread.
     """
@@ -47,8 +48,11 @@ def stream(camera):
                 resize=camera.stream_resolution,
                 splitter_port=2
             )
-
-            while do_stream == True:
+            print(stream_queue.empty())
+            print(stream_queue.empty())
+            while stream_queue.empty():
+                print(stream_queue.empty())
+                print("1")
                 camera.camera.wait_recording(1)
         finally:
             camera.camera.stop_recording(splitter_port=2)
@@ -162,7 +166,7 @@ class CameraManager:
         """
         Start straming process.
         """
-        self._stream_thread = Thread(target = stream, args = (self.camera, ))
+        self._stream_thread = Thread(target = stream, args = (self.camera, stream_frame_queue, stream_queue, ))
         self._stream_thread.start()
 
     def stop_streaming(self):
@@ -170,9 +174,9 @@ class CameraManager:
         Stop straming process.
         """
         if self._selected:
-            do_stream = False
+            stream_queue.put(False)
             self._stream_thread.join()
-            do_stream = True
+            stream_queue.get()
         else:
             print("No camera selected.")
 
@@ -180,7 +184,7 @@ class CameraManager:
         """
         Start camera recording.
         """
-        self._record_thread = Thread(target = record, args = (self.camera, ))
+        self._record_thread = Thread(target = record, args = (self.camera, save_frame_queue, record_queue, ))
         self._record_thread.start()
 
     def stop_recording(self):
@@ -188,9 +192,9 @@ class CameraManager:
         Stop camera recording.
         """
         if self._selected:
-            do_record = False
+            record_queue.put(False)
             self._record_thread.join()
-            do_record = True
+            record_queue.get()
         else:
             print("No camera selected.")
 
