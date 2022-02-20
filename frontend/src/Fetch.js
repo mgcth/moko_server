@@ -9,14 +9,11 @@ function FetchSimple(url, type, header) {
         .then(data => data)
 }
 
-function Fetch(url, type, header, setData, setError) {
+function Fetch(url, message, setData, setError) {
     const abortCont = new AbortController()
+    message["signal"] = abortCont.signal
 
-    fetch(url, {
-        signal: abortCont.signal,
-        headers: header,
-        method: type
-    })
+    fetch(url, message)
         .then(res => {
             if (!res.ok) {
                 throw Error("Could not fetch data.")
@@ -42,9 +39,13 @@ function Fetch(url, type, header, setData, setError) {
 function useFetchGet(url, type, header) {
     const [data, setData] = useState([])
     const [error, setError] = useState(null)
+    const message = {
+        method: type,
+        headers: header
+    }
 
     useEffect(() => {
-        const abortCont = Fetch(url, type, header, setData, setError)
+        const abortCont = Fetch(url, message, setData, setError)
 
         return () => abortCont.abort;
     }, [url])

@@ -4,12 +4,14 @@ import { useLocation } from "react-router";
 import { Link, renderMatches } from 'react-router-dom';
 import styled from 'styled-components';
 import Select from 'react-select';
-import { useFetchGet } from "./Fetch.js"
+import { useFetchGet, Fetch } from "./Fetch.js"
 import {
   host,
   host_ws,
   host_stream,
   host_camera_config,
+  host_get_camera_backend,
+  host_set_camera_backend,
   host_read_cameras,
   host_save_camera
 } from "./Hosts.js"
@@ -73,23 +75,36 @@ function CameraName({ setCameraState }) {
   )
 }
 
-function CameraModels({ setCameraState, server }) {
+function CameraBackend({ setCameraState, server, setBackend }) {
   const headers = {
     "Content-type": "application/json",
     "Authorization": "Bearer " + server.token,
   }
-  const { data, error } = useFetchGet(server.host + host_camera_config, "GET", headers)
+  const { data, error } = useFetchGet(server.host + host_get_camera_backend, "GET", headers)
 
   const [handleChange] = useState((e) => {
     return (e) => {
-      setCameraState(cameraState => ({ ...cameraState, model: e.value }))
+      setCameraState(cameraState => ({ ...cameraState, backend: e.value }))
+
+      const postOptions = {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer " + server.token,
+        },
+        body: JSON.stringify(e.value)
+      };
+
+      fetch(server.host + host_set_camera_backend, postOptions)
+      .then(res => res.json())
+      .then(res => setBackend(res))
     }
   })
 
   return (
     <div>
-      <Label>Model</Label>
-      <Select options={"model" in data && data.model.map(item => (
+      <Label>Backend</Label>
+      <Select options={data.map(item => (
         { label: item, value: item }
       ))
       } onChange={handleChange} />
@@ -97,23 +112,67 @@ function CameraModels({ setCameraState, server }) {
   )
 }
 
-function CameraModes({ setCameraState, server }) {
-  const headers = {
-    "Content-type": "application/json",
-    "Authorization": "Bearer " + server.token,
-  }
-  const { data, error } = useFetchGet(server.host + host_camera_config, "GET", headers)
+function CameraModel({ setCameraState, setModel, server, backend }) {
+  const [data, setData] = useState([])
+  const [error, setError] = useState()
+
+  useEffect(() => {
+    const postMessage = {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + server.token,
+      },
+    };
+
+    Fetch(server.host + host_camera_config, postMessage, setData, setError)
+  }, [backend])
+
+  const [handleChange] = useState((e) => {
+    return (e) => {
+      setCameraState(cameraState => ({ ...cameraState, model: e.value }))
+      setModel(e.value)
+    }
+  })
+
+  return (
+    <div>
+      <Label>Model</Label>
+      <Select options={backend && "model" in data && data.model.map(item => (
+        { label: item, value: item }
+      ))
+      } onChange={handleChange} />
+    </div>
+  )
+}
+
+function CameraModes({ setCameraState, setMode, model, server, backend }) {
+  const [data, setData] = useState([])
+  const [error, setError] = useState()
+
+  useEffect(() => {
+    const postMessage = {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json",
+        "Authorization": "Bearer " + server.token,
+      },
+    };
+
+    Fetch(server.host + host_camera_config, postMessage, setData, setError)
+  }, [backend])
 
   const [handleChange] = useState((e) => {
     return (e) => {
       setCameraState(cameraState => ({ ...cameraState, mode: e.value }))
+      setMode(e.value)
     }
   })
 
   return (
     <div>
       <Label>Modes</Label>
-      <Select options={"modes" in data &&
+      <Select options={model && "modes" in data &&
         data.modes.map(item => (
           {
             value: item,
@@ -121,6 +180,45 @@ function CameraModes({ setCameraState, server }) {
           }
         ))
       } onChange={handleChange} />
+    </div>
+  )
+}
+
+function CameraFPS({ mode, setCameraState }) {
+  const [minFPS, setMinFPS] = useState(1)
+  const [maxFPS, setMaxFPS] = useState(2)
+
+  useEffect(() => {
+    if (mode) {
+      setMinFPS(mode[2][0])
+      setMaxFPS(mode[2][1])
+    }
+  }, [mode])
+
+  const [handleChange] = useState((e) => {
+    let default_value = 1
+    return (e) => {
+      const value = parseFloat(e.target.value, 10)
+      if (minFPS <= value <= maxFPS) {
+        default_value = value
+      }
+      setCameraState(cameraState => ({ ...cameraState, fps: default_value }))
+    }
+  })
+
+  return (
+    <div>
+      <Label>Frames per second</Label>
+      <input
+        type="number"
+        className="form-control"
+        placeholder={`Dynamic value set by camera mode (${minFPS}, ${maxFPS})`}
+        min={minFPS}
+        max={maxFPS}
+        step={0.1}
+        onChange={handleChange}
+      >
+      </input>
     </div>
   )
 }
@@ -142,9 +240,10 @@ function CameraQuality({ setCameraState }) {
       <input
         type="number"
         className="form-control"
-        placeholder="JPEG quality, default 10, value between 1-100"
+        placeholder="Stream JPEG quality, default 10, value between 1-100"
         min={1}
         max={100}
+        step={1}
         onChange={handleChange}
       >
       </input>
@@ -214,12 +313,18 @@ function CameraSave({ cameraState, server }) {
 }
 
 function CameraSettings({ setCameraState, server }) {
+  const [backend, setBackend] = useState()
+  const [model, setModel] = useState()
+  const [mode, setMode] = useState()
+
   return (
     <SettingsPane>
       <Label>Camera settings</Label>
       <CameraName setCameraState={setCameraState} />
-      <CameraModels setCameraState={setCameraState} server={server} />
-      <CameraModes setCameraState={setCameraState} server={server} />
+      <CameraBackend setCameraState={setCameraState} server={server} setBackend={setBackend} />
+      <CameraModel setCameraState={setCameraState} setModel={setModel} server={server} backend={backend} />
+      <CameraModes setCameraState={setCameraState} setMode={setMode} model={model} server={server} backend={backend} />
+      <CameraFPS setCameraState={setCameraState} mode={mode} />
       <CameraQuality setCameraState={setCameraState} />
       <CameraRotation setCameraState={setCameraState} />
       <CameraSaveFolder setCameraState={setCameraState} />
@@ -230,6 +335,7 @@ function CameraSettings({ setCameraState, server }) {
 function AddCamera(props) {
   const [cameraState, setCameraState] = useState([])
   const server = useLocation().state
+  console.log(cameraState)
 
   return (
     <Section>

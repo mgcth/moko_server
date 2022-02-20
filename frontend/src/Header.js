@@ -6,9 +6,9 @@ const Header = styled.header`
   position: fixed;
   top: 20px;
   left: 20px;
-
   background: #f0f0f0;
   text-transform: capitalize;
+  z-index: 1;
 `;
 
 const Nav = styled.nav`
