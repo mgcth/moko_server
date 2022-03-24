@@ -11,6 +11,7 @@ base = (
         "sanic==21.12.1",
         "Sanic-Cors==2.0.0",
         "sanic-routing==0.7.2",
+        "sanic-jwt==1.7.0",
         "ujson==5.1.0",
         "uvloop==0.16.0",
         "websockets==10.1",
