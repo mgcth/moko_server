@@ -1,3 +1,6 @@
+from sanic_jwt import exceptions
+
+
 class User:
     """
     User class.
@@ -22,3 +25,29 @@ class User:
         Create dict from object.
         """
         return {"user_id": self.user_id, "username": self.username}
+
+
+USER_FILE = "../../user.json"
+users = [User(1, "user", "pass")]
+username_table = {u.username: u for u in users}
+userid_table = {u.user_id: u for u in users}
+
+
+async def authenticate(request, *args, **kwargs):
+    """
+    User authentication.
+    """
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+
+    if not username or not password:
+        raise exceptions.AuthenticationFailed()
+
+    user = username_table.get(username, None)
+    if user is None:
+        raise exceptions.AuthenticationFailed()
+
+    if password != user.password:
+        raise exceptions.AuthenticationFailed()
+
+    return user

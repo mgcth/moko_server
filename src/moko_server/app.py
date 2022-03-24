@@ -4,39 +4,15 @@ from sanic import Sanic
 from sanic_cors import CORS
 from json import dumps, loads
 from sanic.response import json
-from sanic_jwt import exceptions
 from sanic_jwt import initialize
+from user import User, authenticate
 from sanic_jwt.decorators import protected
-
 from camera import CameraManager, RaspberryPiCamera, stream_frame_queue
-from user import User
 
+
+CAMERA_LIST_FILE = "../../camera_list.json"
 
 camera_manager = CameraManager([RaspberryPiCamera])
-
-users = [User(1, "user", "pass")]
-
-username_table = {u.username: u for u in users}
-userid_table = {u.user_id: u for u in users}
-
-
-async def authenticate(request, *args, **kwargs):
-    """ """
-    username = request.json.get("username", None)
-    password = request.json.get("password", None)
-
-    if not username or not password:
-        raise exceptions.AuthenticationFailed()
-
-    user = username_table.get(username, None)
-    if user is None:
-        raise exceptions.AuthenticationFailed()
-
-    if password != user.password:
-        raise exceptions.AuthenticationFailed()
-
-    return user
-
 
 app = Sanic(__name__)
 initialize(app, authenticate=authenticate)
@@ -47,8 +23,6 @@ app.config.WEBSOCKET_READ_LIMIT = 2**16  # 16
 app.config.WEBSOCKET_WRITE_LIMIT = 2**16  # 16
 
 CORS(app)
-
-CAMERA_LIST_FILE = "../../camera_list.json"
 
 
 def startup():
