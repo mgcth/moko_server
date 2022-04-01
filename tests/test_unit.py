@@ -55,7 +55,7 @@ def test_unit_camera_settings():
     assert all([x == modes["V2"][i] for i, x in enumerate(camera_settings.modes["V2"])])
 
 
-class MockCamera1(Mock):
+class MockCamera(Mock):
     def __enter__(self):
         return self
 
@@ -66,15 +66,14 @@ class MockCamera1(Mock):
         return True
 
 
-class MockCamera2(Mock):
-    def __enter__(self):
-        return self
+class MockCamera1(MockCamera):
+    def __repr__(self):
+        return "Cam1"
 
-    def __exit__(self, type, value, traceback):
-        pass
 
-    def exist(self):
-        return True
+class MockCamera2(MockCamera):
+    def __repr__(self):
+        return "Cam2"
 
 
 def test_camera_manager_init():
@@ -121,3 +120,13 @@ def test_camera_manager_select():
     """
     Test the select method of camera manager class.
     """
+    fake_class_list = [MockCamera1, MockCamera2]
+    cm = CameraManager(fake_class_list)
+    cm.scan()
+    cm.select("Cam1")
+    assert cm._selected == MockCamera1
+
+    cm.select("Cam2")
+    assert cm._selected == MockCamera2
+
+    # cm.select("NoCam")
