@@ -5,9 +5,9 @@ from sanic_cors import CORS
 from json import dumps, loads
 from sanic.response import json
 from sanic_jwt import initialize
-from user import User, authenticate
 from sanic_jwt.decorators import protected
-from camera import CameraManager, RaspberryPiCamera, stream_frame_queue
+from moko_server.user import User, authenticate
+from moko_server.camera import CameraManager, RaspberryPiCamera, stream_frame_queue
 
 
 CAMERA_LIST_FILE = "../../camera_list.json"

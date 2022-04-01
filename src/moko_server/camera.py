@@ -5,7 +5,7 @@ from io import BytesIO
 from threading import Thread
 from datetime import datetime
 from picamera import PiCamera
-from camera_settings import CameraSettings
+from moko_server.camera_settings import CameraSettings
 
 save_frame_queue = queue.Queue(25)
 stream_frame_queue = queue.Queue()
