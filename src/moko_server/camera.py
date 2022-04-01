@@ -134,7 +134,7 @@ class CameraManager:
         Scan hardware for available cameras from defined classes. Or rather,
         use the implemented camera classes to check if any camera is found. Let
         the user select which class to use if several find the same camera.
-        Class mush support contex managers.
+        Class must support contex managers.
         """
         camera_set = set()
         for camera_class in self._backend:
