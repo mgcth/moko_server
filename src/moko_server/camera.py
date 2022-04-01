@@ -114,7 +114,7 @@ class SplitFrames:
 class CameraManager:
     """
     Camera manager, managing different types of camera hardware.
-    Note that, a class for that paritcular camera must be implemented.
+    Note that, a class for that particular camera must be implemented.
     So, this manager will only scan and make available cameras that have
     a class implemented.
     """
@@ -131,7 +131,7 @@ class CameraManager:
 
     def scan(self):
         """
-        Scan hardware for available cameras from defined calsses. Or rather,
+        Scan hardware for available cameras from defined classes. Or rather,
         use the implemented camera classes to check if any camera is found. Let
         the user select which class to use if several find the same camera.
         Class mush support contex managers.
@@ -160,7 +160,7 @@ class CameraManager:
 
     def start_streaming(self):
         """
-        Start straming process.
+        Start streaming process.
         """
         self._stream_thread = Thread(
             target=stream,
@@ -175,7 +175,7 @@ class CameraManager:
 
     def stop_streaming(self):
         """
-        Stop straming process.
+        Stop streaming process.
         """
         if self._selected:
             stream_queue.put(False)
