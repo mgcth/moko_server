@@ -1,5 +1,6 @@
 from moko_server.user import User
 from moko_server.camera_settings import CameraHardware, CameraSettings
+from moko_server.camera import CameraManager
 
 user_id = 0
 username = "username"
@@ -46,3 +47,31 @@ def test_unit_camera_settings():
 
     assert all([x == modes["V1"][i] for i, x in enumerate(camera_settings.modes["V1"])])
     assert all([x == modes["V2"][i] for i, x in enumerate(camera_settings.modes["V2"])])
+
+
+def test_camera_manager_init():
+    """
+    Test the init method of camera manager class.
+    """
+
+    cm = CameraManager()
+    assert cm._backend == []
+    assert cm._usable == None
+    assert cm._selected == None
+    assert cm.camera == None
+    assert cm._record_thread == None
+
+    fake_class_list = ["FakeClass"]
+    cm = CameraManager(fake_class_list)
+    assert cm._backend == fake_class_list
+    assert cm._usable == None
+    assert cm._selected == None
+    assert cm.camera == None
+    assert cm._record_thread == None
+
+
+def test_camera_manager_scan():
+    """
+    Test the scan method of camera manager class.
+    """
+    pass
