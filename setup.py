@@ -15,6 +15,7 @@ base = (
         "ujson==5.1.0",
         "uvloop==0.16.0",
         "websockets==10.1",
+        "Pillow==9.0.1",
     ],
 )
 
