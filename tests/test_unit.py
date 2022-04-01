@@ -1,3 +1,8 @@
+import sys
+from unittest.mock import Mock
+
+sys.modules["picamera"] = Mock()
+
 from moko_server.user import User
 from moko_server.camera_settings import CameraHardware, CameraSettings
 from moko_server.camera import CameraManager
@@ -5,6 +10,20 @@ from moko_server.camera import CameraManager
 user_id = 0
 username = "username"
 password = "pass"
+
+
+def test_unit_user():
+    """Test user class, initialisation and methods."""
+    user = User(user_id, username, password)
+
+    assert user.user_id == user_id
+    assert user.username == username
+    assert user.password == password
+
+    assert repr(user) == "User(id='{0}')".format(user_id)
+
+    assert user.to_dict() == {"user_id": user_id, "username": username}
+
 
 module = {"ov5647": "V1", "imx219": "V2"}
 modes = {
@@ -26,19 +45,6 @@ modes = {
 }
 
 
-def test_unit_user():
-    """Test user class, initialisation and methods."""
-    user = User(user_id, username, password)
-
-    assert user.user_id == user_id
-    assert user.username == username
-    assert user.password == password
-
-    assert repr(user) == "User(id='{0}')".format(user_id)
-
-    assert user.to_dict() == {"user_id": user_id, "username": username}
-
-
 def test_unit_camera_settings():
     """Test camera settings class."""
     camera_settings = CameraSettings()
@@ -49,11 +55,32 @@ def test_unit_camera_settings():
     assert all([x == modes["V2"][i] for i, x in enumerate(camera_settings.modes["V2"])])
 
 
+class MockCamera1(Mock):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        pass
+
+    def exist(self):
+        return True
+
+
+class MockCamera2(Mock):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        pass
+
+    def exist(self):
+        return True
+
+
 def test_camera_manager_init():
     """
     Test the init method of camera manager class.
     """
-
     cm = CameraManager()
     assert cm._backend == []
     assert cm._usable == None
@@ -74,4 +101,23 @@ def test_camera_manager_scan():
     """
     Test the scan method of camera manager class.
     """
-    pass
+    fake_class_list = [MockCamera1]
+    cm = CameraManager(fake_class_list)
+    cm.scan()
+    assert len(cm._usable) == 1
+
+    fake_class_list = [MockCamera1, MockCamera1]
+    cm = CameraManager(fake_class_list)
+    cm.scan()
+    assert len(cm._usable) == 1
+
+    fake_class_list = [MockCamera1, MockCamera2]
+    cm = CameraManager(fake_class_list)
+    cm.scan()
+    assert len(cm._usable) == 2
+
+
+def test_camera_manager_select():
+    """
+    Test the select method of camera manager class.
+    """
