@@ -1,6 +1,6 @@
 import sys
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, mock_open, patch
 from sanic_jwt import exceptions
 
 sys.modules["picamera"] = Mock()
@@ -36,27 +36,43 @@ class Request:
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "input, expected",
+    "input, mock_table, expected",
     [
-        ({}, None),
-        ({"username": "", "password": ""}, None),
-        ({"username": "user", "password": ""}, None),
-        ({"username": "user", "password": "pass"}, User(1, "user", "pass")),
+        ({}, {}, None),
+        ({"username": ""}, {}, None),
+        ({"password": ""}, {}, None),
+        (
+            {"username": "user", "password": "pass"},
+            {u.username: u for u in [User(1, "", "")]},
+            None,
+        ),
+        (
+            {"username": "user", "password": "wrongpass"},
+            {u.username: u for u in [User(1, "user", "pass")]},
+            None,
+        ),
+        (
+            {"username": "user", "password": "pass"},
+            {u.username: u for u in [User(1, "user", "pass")]},
+            User(1, "user", "pass"),
+        ),
     ],
 )
-async def test_unit_authenticate(input, expected):
+async def test_unit_authenticate(input, mock_table, expected):
     """
     Test user authentication code.
     """
-    request = Request(input)
-    if expected is None:
+    with patch.dict("moko_server.user.username_table", mock_table, clear=True):
+        request = Request(input)
+        if expected is not None:
+            user = await authenticate(request)
+            assert user.user_id == 1
+            assert user.username == "user"
+            assert user.password == "pass"
+            return None
+
         with pytest.raises(exceptions.AuthenticationFailed):
             await authenticate(request)
-    else:
-        user = await authenticate(request)
-        assert user.user_id == 1
-        assert user.username == "user"
-        assert user.password == "pass"
 
 
 module = {"ov5647": "V1", "imx219": "V2"}

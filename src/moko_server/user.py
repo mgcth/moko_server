@@ -30,7 +30,6 @@ class User:
 USER_FILE = "../../user.json"
 users = [User(1, "user", "pass")]
 username_table = {u.username: u for u in users}
-userid_table = {u.user_id: u for u in users}
 
 
 async def authenticate(request, *args, **kwargs):
@@ -40,10 +39,16 @@ async def authenticate(request, *args, **kwargs):
     username = request.json.get("username", None)
     password = request.json.get("password", None)
 
+    print("HERE")
+    print(username)
+    print(password)
     if not username or not password:
         raise exceptions.AuthenticationFailed()
 
+    print("HERE2")
+    print(username)
     user = username_table.get(username, None)
+    print(user)
     if user is None:
         raise exceptions.AuthenticationFailed()
 
