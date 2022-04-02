@@ -137,10 +137,10 @@ def test_camera_manager_init(input, expected):
     """
     cm = CameraManager() if input is None else CameraManager(input)
     assert cm._backend == expected
-    assert cm._usable == None
-    assert cm._selected == None
-    assert cm.camera == None
-    assert cm._record_thread == None
+    assert cm._usable is None
+    assert cm._selected is None
+    assert cm.camera is None
+    assert cm._record_thread is None
 
 
 @pytest.mark.parametrize(
@@ -185,7 +185,7 @@ def test_camera_manager_select():
     cm.scan()
 
     cm.select("NoCam")
-    assert cm._selected == None
+    assert cm._selected is None
 
     cm.select("Cam1")
     assert cm._selected == MockCamera1
@@ -203,7 +203,7 @@ def test_camera_manager_selected():
     cm.scan()
 
     cm.select("NoCam")
-    assert cm.selected == None
+    assert cm.selected is None
 
     cm.select("Cam1")
     assert cm.selected == MockCamera1
@@ -219,10 +219,10 @@ def test_camera_manager_deselect():
     fake_class_list = [MockCamera1]
     cm = CameraManager(fake_class_list)
     cm.scan()
-    assert cm._selected == None
+    assert cm._selected is None
 
     cm.select("Cam1")
     assert cm._selected == MockCamera1
 
     cm.deselect()
-    assert cm._selected == None
+    assert cm._selected is None
