@@ -148,9 +148,12 @@ class CameraManager:
         """
         Select an available camera, make that camera unavailable if set.
         """
-        self._selected = [
-            usable for usable in self._usable if repr(usable()) == camera
-        ][0]
+        try:
+            self._selected = {
+                usable for usable in self._usable if repr(usable()) == camera
+            }.pop()
+        except KeyError:
+            print("{0} camera class not found, try again.".format(camera))
 
     def deselect(self):
         """

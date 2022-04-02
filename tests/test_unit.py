@@ -123,10 +123,12 @@ def test_camera_manager_select():
     fake_class_list = [MockCamera1, MockCamera2]
     cm = CameraManager(fake_class_list)
     cm.scan()
+
+    cm.select("NoCam")
+    assert cm._selected == None
+
     cm.select("Cam1")
     assert cm._selected == MockCamera1
 
     cm.select("Cam2")
     assert cm._selected == MockCamera2
-
-    # cm.select("NoCam")
