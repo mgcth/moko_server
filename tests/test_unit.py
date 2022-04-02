@@ -1,6 +1,7 @@
 import sys
 import pytest
 from unittest.mock import Mock
+from sanic_jwt import exceptions
 
 sys.modules["picamera"] = Mock()
 
@@ -26,6 +27,36 @@ def test_unit_user():
     assert repr(user) == "User(id='{0}')".format(user_id)
 
     assert user.to_dict() == {"user_id": user_id, "username": username}
+
+
+class Request:
+    def __init__(self, json):
+        self.json = json
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "input, expected",
+    [
+        ({}, None),
+        ({"username": "", "password": ""}, None),
+        ({"username": "user", "password": ""}, None),
+        ({"username": "user", "password": "pass"}, User(1, "user", "pass")),
+    ],
+)
+async def test_unit_authenticate(input, expected):
+    """
+    Test user authentication code.
+    """
+    request = Request(input)
+    if expected is None:
+        with pytest.raises(exceptions.AuthenticationFailed):
+            await authenticate(request)
+    else:
+        user = await authenticate(request)
+        assert user.user_id == 1
+        assert user.username == "user"
+        assert user.password == "pass"
 
 
 module = {"ov5647": "V1", "imx219": "V2"}
