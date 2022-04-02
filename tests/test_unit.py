@@ -128,7 +128,7 @@ def test_camera_manager_usable():
     fake_class_list = [MockCamera1, MockCamera2]
     cm = CameraManager(fake_class_list)
     cm.scan()
-    assert cm.usable == ["Cam1", "Cam2"]
+    assert set(cm.usable) == {"Cam1", "Cam2"}
 
 
 def test_camera_manager_select():
