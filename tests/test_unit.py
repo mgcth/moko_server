@@ -1,9 +1,10 @@
 import sys
+import pytest
 from unittest.mock import Mock
 
 sys.modules["picamera"] = Mock()
 
-from moko_server.user import User
+from moko_server.user import User, authenticate
 from moko_server.camera_settings import CameraHardware, CameraSettings
 from moko_server.camera import CameraManager
 
@@ -13,7 +14,9 @@ password = "pass"
 
 
 def test_unit_user():
-    """Test user class, initialisation and methods."""
+    """
+    Test user class, initialisation and methods.
+    """
     user = User(user_id, username, password)
 
     assert user.user_id == user_id
@@ -46,7 +49,9 @@ modes = {
 
 
 def test_unit_camera_settings():
-    """Test camera settings class."""
+    """
+    Test camera settings class.
+    """
     camera_settings = CameraSettings()
 
     assert camera_settings.module == {"ov5647": "V1", "imx219": "V2"}
@@ -76,59 +81,52 @@ class MockCamera2(MockCamera):
         return "Cam2"
 
 
-def test_camera_manager_init():
+@pytest.mark.parametrize(
+    "input, expected", [(None, []), (["FakeClass"], ["FakeClass"])]
+)
+def test_camera_manager_init(input, expected):
     """
     Test the init method of camera manager class.
     """
-    cm = CameraManager()
-    assert cm._backend == []
-    assert cm._usable == None
-    assert cm._selected == None
-    assert cm.camera == None
-    assert cm._record_thread == None
-
-    fake_class_list = ["FakeClass"]
-    cm = CameraManager(fake_class_list)
-    assert cm._backend == fake_class_list
+    cm = CameraManager() if input is None else CameraManager(input)
+    assert cm._backend == expected
     assert cm._usable == None
     assert cm._selected == None
     assert cm.camera == None
     assert cm._record_thread == None
 
 
-def test_camera_manager_scan():
+@pytest.mark.parametrize(
+    "input, expected",
+    [
+        ([MockCamera1], 1),
+        ([MockCamera1, MockCamera1], 1),
+        ([MockCamera1, MockCamera2], 2),
+    ],
+)
+def test_camera_manager_scan(input, expected):
     """
     Test the scan method of camera manager class.
     """
-    fake_class_list = [MockCamera1]
-    cm = CameraManager(fake_class_list)
+    cm = CameraManager(input)
     cm.scan()
-    assert len(cm._usable) == 1
-
-    fake_class_list = [MockCamera1, MockCamera1]
-    cm = CameraManager(fake_class_list)
-    cm.scan()
-    assert len(cm._usable) == 1
-
-    fake_class_list = [MockCamera1, MockCamera2]
-    cm = CameraManager(fake_class_list)
-    cm.scan()
-    assert len(cm._usable) == 2
+    assert len(cm._usable) == expected
 
 
-def test_camera_manager_usable():
+@pytest.mark.parametrize(
+    "input, expected",
+    [
+        ([MockCamera1], {"Cam1"}),
+        ([MockCamera1, MockCamera2], {"Cam1", "Cam2"}),
+    ],
+)
+def test_camera_manager_usable(input, expected):
     """
     Test the usable property of camera manager class.
     """
-    fake_class_list = [MockCamera1]
-    cm = CameraManager(fake_class_list)
+    cm = CameraManager(input)
     cm.scan()
-    assert cm.usable == ["Cam1"]
-
-    fake_class_list = [MockCamera1, MockCamera2]
-    cm = CameraManager(fake_class_list)
-    cm.scan()
-    assert set(cm.usable) == {"Cam1", "Cam2"}
+    assert set(cm.usable) == expected
 
 
 def test_camera_manager_select():
