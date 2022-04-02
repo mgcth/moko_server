@@ -1,3 +1,5 @@
+[![Linting](https://github.com/mgcth/moko_server/actions/workflows/github-actions-linting-moko-server.yaml/badge.svg?branch=main)](https://github.com/mgcth/moko_server/actions/workflows/github-actions-linting-moko-server.yaml)
+[![Unit tests](https://github.com/mgcth/moko_server/actions/workflows/github-actions-unit-tests-moko-server.yaml/badge.svg?branch=main)](https://github.com/mgcth/moko_server/actions/workflows/github-actions-unit-tests-moko-server.yaml)
 # moko
 This is the backend part of moko. Moko is a separate client (frontend) and server (backend) component to manage camera feeds over the web. Its aims are:
 - Be simple and hackable.
