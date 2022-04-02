@@ -129,6 +129,20 @@ class CameraManager:
         self.camera = None
         self._record_thread = None
 
+    @property
+    def usable(self):
+        """
+        Return usable camera backends as string.
+        """
+        return [repr(camera()) for camera in self._usable]
+
+    @property
+    def selected(self):
+        """
+        Return the selected camera.
+        """
+        return self._selected
+
     def scan(self):
         """
         Scan hardware for available cameras from defined classes. Or rather,
@@ -212,20 +226,6 @@ class CameraManager:
             record_queue.get()
         else:
             print("No camera selected.")
-
-    @property
-    def usable(self):
-        """
-        Return usable camera backends as string.
-        """
-        return [repr(camera()) for camera in self._usable]
-
-    @property
-    def selected(self):
-        """
-        Return the selected camera.
-        """
-        return self._selected
 
 
 class RaspberryPiCamera:

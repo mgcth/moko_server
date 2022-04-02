@@ -116,6 +116,21 @@ def test_camera_manager_scan():
     assert len(cm._usable) == 2
 
 
+def test_camera_manager_usable():
+    """
+    Test the usable property of camera manager class.
+    """
+    fake_class_list = [MockCamera1]
+    cm = CameraManager(fake_class_list)
+    cm.scan()
+    assert cm.usable == ["Cam1"]
+
+    fake_class_list = [MockCamera1, MockCamera2]
+    cm = CameraManager(fake_class_list)
+    cm.scan()
+    assert cm.usable == ["Cam1", "Cam2"]
+
+
 def test_camera_manager_select():
     """
     Test the select method of camera manager class.
@@ -132,6 +147,24 @@ def test_camera_manager_select():
 
     cm.select("Cam2")
     assert cm._selected == MockCamera2
+
+
+def test_camera_manager_selected():
+    """
+    Test the selected property of camera manager class.
+    """
+    fake_class_list = [MockCamera1, MockCamera2]
+    cm = CameraManager(fake_class_list)
+    cm.scan()
+
+    cm.select("NoCam")
+    assert cm.selected == None
+
+    cm.select("Cam1")
+    assert cm.selected == MockCamera1
+
+    cm.select("Cam2")
+    assert cm.selected == MockCamera2
 
 
 def test_camera_manager_deselect():
