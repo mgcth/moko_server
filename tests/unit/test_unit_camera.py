@@ -1,6 +1,7 @@
 import sys
 import pytest
-from unittest.mock import Mock
+import unittest.mock
+from unittest.mock import Mock, patch
 
 sys.modules["picamera"] = Mock()
 
@@ -126,3 +127,83 @@ def test_camera_manager_deselect():
 
     cm.deselect()
     assert cm._selected is None
+
+
+@patch("moko_server.camera.Thread")
+def test_camera_manager_start_streaming(mock_thread):
+    """
+    Test the start_streaming method of camera manager class.
+    """
+    fake_class_list = [MockCamera1]
+    cm = CameraManager(fake_class_list)
+    cm.scan()
+    cm.select("Cam1")
+    cm.start_streaming()
+
+    mock_thread.assert_called_once()
+    assert mock_thread.return_value.daemon == True
+    mock_thread.return_value.start.assert_called_once()
+
+
+@patch("moko_server.camera.Thread")
+@patch("moko_server.camera.stream_queue")
+def test_camera_manager_stop_streaming(mock_stream_queue, mock_thread):
+    """
+    Test the stop_streaming method of camera manager class.
+    """
+    fake_class_list = [MockCamera1]
+    cm = CameraManager(fake_class_list)
+    cm.scan()
+
+    cm.stop_streaming()
+    assert not mock_stream_queue.put.called
+    assert not mock_thread.return_value.join.called
+    assert not mock_stream_queue.get.called
+
+    cm.select("Cam1")
+    cm.start_streaming()
+    cm.stop_streaming()
+
+    mock_stream_queue.put.assert_called_once()
+    mock_thread.return_value.join.assert_called_once()
+    mock_stream_queue.get.assert_called_once()
+
+
+@patch("moko_server.camera.Thread")
+def test_camera_manager_start_recording(mock_thread):
+    """
+    Test the start_recording method of camera manager class.
+    """
+    fake_class_list = [MockCamera1]
+    cm = CameraManager(fake_class_list)
+    cm.scan()
+    cm.select("Cam1")
+    cm.start_recording()
+
+    mock_thread.assert_called_once()
+    assert mock_thread.return_value.daemon == True
+    mock_thread.return_value.start.assert_called_once()
+
+
+@patch("moko_server.camera.Thread")
+@patch("moko_server.camera.record_queue")
+def test_camera_manager_stop_recording(mock_record_queue, mock_thread):
+    """
+    Test the stop_recording method of camera manager class.
+    """
+    fake_class_list = [MockCamera1]
+    cm = CameraManager(fake_class_list)
+    cm.scan()
+
+    cm.stop_recording()
+    assert not mock_record_queue.put.called
+    assert not mock_thread.return_value.join.called
+    assert not mock_record_queue.get.called
+
+    cm.select("Cam1")
+    cm.start_recording()
+    cm.stop_recording()
+
+    mock_record_queue.put.assert_called_once()
+    mock_thread.return_value.join.assert_called_once()
+    mock_record_queue.get.assert_called_once()
