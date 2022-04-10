@@ -5,10 +5,13 @@ from unittest.mock import Mock, patch
 
 sys.modules["picamera"] = Mock()
 
-from moko_server.camera import CameraManager
+from moko_server.camera_settings import CameraSettings
+from moko_server.camera import CameraManager, RaspberryPiCamera
 
 
 class MockCamera(Mock):
+    revision = "imx219"
+
     def __enter__(self):
         return self
 
@@ -207,3 +210,138 @@ def test_camera_manager_stop_recording(mock_record_queue, mock_thread):
     mock_record_queue.put.assert_called_once()
     mock_thread.return_value.join.assert_called_once()
     mock_record_queue.get.assert_called_once()
+
+
+@patch("moko_server.camera.PiCamera", new_callable=MockCamera)
+def test_picamera_init(mock_picamera):
+    """
+    Test the init method of RaspberryPi camera class.
+    """
+    camera = RaspberryPiCamera()
+
+    assert camera._type == "PiCamera"
+    assert camera.path is None
+    assert camera.name == "A camera has no name"
+    assert camera.settings == CameraSettings()
+    mock_picamera.assert_called_once()
+
+    assert camera.camera.rotation == 0
+    assert camera.quality == 10
+    assert camera.camera.framerate == 10
+
+    assert camera.resolution == (1640, 1232)
+    assert camera.camera.resolution == camera.resolution
+    assert camera.stream_resolution == (800, 400)
+    assert camera._frame == None
+
+    assert camera.frame_num == 0
+    assert camera.output == None
+
+
+@patch("moko_server.camera.PiCamera")
+def test_picamera_del(mock_picamera):
+    """
+    Test the del method of RaspberryPi camera class.
+    """
+    camera = RaspberryPiCamera()
+    camera.__del__()
+    mock_picamera.return_value.close.assert_called_once()
+
+
+@patch("moko_server.camera.PiCamera")
+def test_picamera_enter(mock_picamera):
+    """
+    Test the enter method of RaspberryPi camera class.
+    """
+    camera = RaspberryPiCamera()
+    cam = camera.__enter__()
+    assert camera == cam
+
+
+@patch("moko_server.camera.PiCamera")
+def test_picamera_exit(mock_picamera):
+    """
+    Test the exit method of RaspberryPi camera class.
+    """
+    camera = RaspberryPiCamera()
+    camera.__exit__(None, None, None)
+    mock_picamera.return_value.close.assert_called_once()
+
+
+@patch("moko_server.camera.PiCamera")
+def test_picamera_repr(mock_picamera):
+    """
+    Test the repr method of RaspberryPi camera class.
+    """
+    camera = RaspberryPiCamera()
+    assert camera.__repr__() == "PiCamera"
+
+
+@patch("moko_server.camera.PiCamera")
+def test_picamera_eq(mock_picamera):
+    """
+    Test the eq method of RaspberryPi camera class.
+    """
+    camera = RaspberryPiCamera()
+    assert camera.__eq__("PiCamera") is True
+
+
+@patch("moko_server.camera.PiCamera")
+def test_picamera_close(mock_picamera):
+    """
+    Test the close method of RaspberryPi camera class.
+    """
+    camera = RaspberryPiCamera()
+    camera.close()
+    mock_picamera.return_value.close.assert_called_once()
+
+
+@pytest.mark.parametrize("input, expected", [(MockCamera, True), (Mock, False)])
+def test_picamera_exist(input, expected):
+    """
+    Test the exist method of RaspberryPi camera class.
+    """
+    with patch("moko_server.camera.PiCamera", new_callable=input):
+        camera = RaspberryPiCamera()
+        assert camera.exist() is expected
+
+
+@pytest.mark.parametrize("input, expected", [(MockCamera, "V2"), (Mock, None)])
+def test_picamera_model(input, expected):
+    """
+    Test the _model method of RaspberryPi camera class.
+    """
+    with patch("moko_server.camera.PiCamera", new_callable=input):
+        camera = RaspberryPiCamera()
+        assert camera._model() is expected
+
+
+@pytest.mark.parametrize("input, expected", [(MockCamera, "V2"), (Mock, None)])
+def test_picamera_model(input, expected):
+    """
+    Test the model property of RaspberryPi camera class.
+    """
+    with patch("moko_server.camera.PiCamera", new_callable=input):
+        camera = RaspberryPiCamera()
+        assert camera.model is expected
+
+
+@pytest.mark.parametrize(
+    "input, expected", [(MockCamera, CameraSettings().modes["V2"]), (Mock, None)]
+)
+def test_picamera_modes(input, expected):
+    """
+    Test the modes property of RaspberryPi camera class.
+    """
+    with patch("moko_server.camera.PiCamera", new_callable=input):
+        camera = RaspberryPiCamera()
+        assert camera.modes is expected
+
+
+@patch("moko_server.camera.PiCamera")
+def test_picamera_frame(mock_picamera):
+    """
+    Test the frame property of RaspberryPi camera class.
+    """
+    camera = RaspberryPiCamera()
+    assert camera.frame is None
