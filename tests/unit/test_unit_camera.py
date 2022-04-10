@@ -345,3 +345,13 @@ def test_picamera_frame(mock_picamera):
     """
     camera = RaspberryPiCamera()
     assert camera.frame is None
+
+
+@patch("moko_server.camera.PiCamera")
+def test_picamera_start_recording(mock_picamera):
+    """
+    Test the start_recording property of RaspberryPi camera class.
+    """
+    camera = RaspberryPiCamera()
+    camera.record()
+    mock_picamera.return_value.start_recording.assert_called_once()
