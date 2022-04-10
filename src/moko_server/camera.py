@@ -264,7 +264,12 @@ class RaspberryPiCamera:
         self.camera.framerate = framerate
 
         model = self._model()
-        self.resolution = self.settings.modes[model][resolution_id][1]
+        if model is None:
+            print("No camera model found.")
+            self.resolution = (800, 400)
+        else:
+            self.resolution = self.settings.modes[model][resolution_id][1]
+
         self.camera.resolution = self.resolution
         self.stream_resolution = (800, 400)
         self._frame = None
@@ -362,7 +367,9 @@ class RaspberryPiCamera:
             yield self._frame
 
     def record(self):
-        """ """
+        """
+        Start recording.
+        """
         self.camera.start_recording(stream, "mjpeg", quality=self.quality)
 
     def save_frame(self, path):
