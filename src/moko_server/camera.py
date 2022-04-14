@@ -1,18 +1,18 @@
 import io
-import time
 import queue
 from PIL import Image
 from io import BytesIO
 from threading import Thread
 from datetime import datetime
-from picamera import PiCamera, PiCameraCircularIO
-from camera_settings import CameraSettings
+from picamera import PiCamera
+from moko_server.camera_settings import CameraSettings
 
 save_frame_queue = queue.Queue(25)
 stream_frame_queue = queue.Queue()
 
 stream_queue = queue.Queue()
 record_queue = queue.Queue()
+
 
 def record(camera, save_frame_queue, stream_queue):
     """
@@ -46,7 +46,7 @@ def stream(camera, stream_frame_queue, stream_queue):
                 "mjpeg",
                 quality=camera.quality,
                 resize=camera.stream_resolution,
-                splitter_port=2
+                splitter_port=2,
             )
             print(stream_queue.empty())
             print(stream_queue.empty())
@@ -61,24 +61,20 @@ def stream(camera, stream_frame_queue, stream_queue):
         print("No camera selected.")
 
 
-class Stream():
+class Stream:
     def __init__(self):
-        """
-        """
+        """ """
         pass
 
     def write(self, buf):
-        """
-        """
+        """ """
         if buf.startswith(b"\xff\xd8"):
             stream_frame_queue.put(BytesIO(buf))
 
 
 class SplitFrames:
     def __init__(self, path):
-        """
-
-        """
+        """ """
         # self.output = None
         self.timestamp = None
         self.frame_num = 0
@@ -90,14 +86,12 @@ class SplitFrames:
         """
         if buf.startswith(b"\xff\xd8"):
             self.update_time()
-            
+
             file = "{0}/image{1}_{2}.jpg".format(
-                self.path,
-                self.timestamp,
-                self.frame_num
+                self.path, self.timestamp, self.frame_num
             )
 
-            if save_frame_queue.full() == True:
+            if save_frame_queue.full() is True:
                 for (frame, file) in iter(save_frame_queue.get, None):
                     output = io.open(file, "wb")
                     output.write(frame)
@@ -120,7 +114,7 @@ class SplitFrames:
 class CameraManager:
     """
     Camera manager, managing different types of camera hardware.
-    Note that, a class for that paritcular camera must be implemented.
+    Note that, a class for that particular camera must be implemented.
     So, this manager will only scan and make available cameras that have
     a class implemented.
     """
@@ -135,12 +129,26 @@ class CameraManager:
         self.camera = None
         self._record_thread = None
 
+    @property
+    def usable(self):
+        """
+        Return usable camera backends as string.
+        """
+        return [repr(camera()) for camera in self._usable]
+
+    @property
+    def selected(self):
+        """
+        Return the selected camera.
+        """
+        return self._selected
+
     def scan(self):
         """
-        Scan hardware for available cameras from defined calsses. Or rather,
+        Scan hardware for available cameras from defined classes. Or rather,
         use the implemented camera classes to check if any camera is found. Let
         the user select which class to use if several find the same camera.
-        Class mush support contex managers.
+        Class must support contex managers.
         """
         camera_set = set()
         for camera_class in self._backend:
@@ -154,7 +162,12 @@ class CameraManager:
         """
         Select an available camera, make that camera unavailable if set.
         """
-        self._selected = [usable for usable in self._usable if repr(usable()) == camera][0]
+        try:
+            self._selected = {
+                usable for usable in self._usable if repr(usable()) == camera
+            }.pop()
+        except KeyError:
+            print("{0} camera class not found, try again.".format(camera))
 
     def deselect(self):
         """
@@ -164,15 +177,22 @@ class CameraManager:
 
     def start_streaming(self):
         """
-        Start straming process.
+        Start streaming process.
         """
-        self._stream_thread = Thread(target = stream, args = (self.camera, stream_frame_queue, stream_queue, ))
+        self._stream_thread = Thread(
+            target=stream,
+            args=(
+                self.camera,
+                stream_frame_queue,
+                stream_queue,
+            ),
+        )
         self._stream_thread.daemon = True
         self._stream_thread.start()
 
     def stop_streaming(self):
         """
-        Stop straming process.
+        Stop streaming process.
         """
         if self._selected:
             stream_queue.put(False)
@@ -185,7 +205,14 @@ class CameraManager:
         """
         Start camera recording.
         """
-        self._record_thread = Thread(target = record, args = (self.camera, save_frame_queue, record_queue, ))
+        self._record_thread = Thread(
+            target=record,
+            args=(
+                self.camera,
+                save_frame_queue,
+                record_queue,
+            ),
+        )
         self._record_thread.daemon = True
         self._record_thread.start()
 
@@ -200,20 +227,6 @@ class CameraManager:
         else:
             print("No camera selected.")
 
-    @property
-    def usable(self):
-        """
-        Return usable camera backends as string.
-        """
-        return [repr(camera()) for camera in self._usable]
-    
-    @property
-    def selected(self):
-        """
-        Return the selected camera.
-        """
-        return self._selected
-    
 
 class RaspberryPiCamera:
     """
@@ -228,7 +241,7 @@ class RaspberryPiCamera:
         resolution_id=1,
         rotation=0,
         quality=10,
-        framerate=10
+        framerate=10,
     ):
         """
         Initialise the camera with a name, resolution (mode), rotation and stream
@@ -251,7 +264,12 @@ class RaspberryPiCamera:
         self.camera.framerate = framerate
 
         model = self._model()
-        self.resolution = self.settings.modes[model][resolution_id][1]
+        if model is None:
+            print("No camera model found.")
+            self.resolution = (800, 400)
+        else:
+            self.resolution = self.settings.modes[model][resolution_id][1]
+
         self.camera.resolution = self.resolution
         self.stream_resolution = (800, 400)
         self._frame = None
@@ -339,10 +357,7 @@ class RaspberryPiCamera:
         """
         stream = BytesIO()
         for _ in self.camera.capture_continuous(
-            stream,
-            "jpeg",
-            use_video_port=True,
-            quality=self.quality
+            stream, "jpeg", use_video_port=True, quality=self.quality
         ):
             stream.seek(0)
             self._frame = stream.read()
@@ -353,6 +368,7 @@ class RaspberryPiCamera:
 
     def record(self):
         """
+        Start recording.
         """
         self.camera.start_recording(stream, "mjpeg", quality=self.quality)
 
@@ -360,7 +376,7 @@ class RaspberryPiCamera:
         """
         Save frame to path.
         """
-        path =  path if path[-1] == "/" else path + "/"
+        path = path if path[-1] == "/" else path + "/"
         date = datetime.now().strftime("%Y%m%d%G%M%S")
         image = Image.open(BytesIO(self._frame))
         image.save(path + date + ".jpg")
