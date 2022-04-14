@@ -32,6 +32,10 @@ class MockCamera2(MockCamera):
         return "Cam2"
 
 
+class MockCameraFrame(MockCamera):
+    capture_continuous = lambda self, a, b, use_video_port=None, quality=None: [1, 2]
+
+
 @pytest.mark.parametrize(
     "input, expected", [(None, []), (["FakeClass"], ["FakeClass"])]
 )
@@ -347,11 +351,63 @@ def test_picamera_frame(mock_picamera):
     assert camera.frame is None
 
 
-@patch("moko_server.camera.PiCamera")
-def test_picamera_start_recording(mock_picamera):
+@patch("moko_server.camera.PiCamera", new_callable=MockCameraFrame)
+@patch("moko_server.camera.BytesIO")
+def test_picamera_next_frame(mock_bytesio, mock_picamera):
     """
-    Test the start_recording property of RaspberryPi camera class.
+    Test the next_frame property of RaspberryPi camera class.
+    """
+    camera = RaspberryPiCamera()
+    for _ in camera.next_frame():
+        continue
+
+    assert mock_bytesio.return_value.seek.call_count == 4
+    assert mock_bytesio.return_value.read.call_count == 2
+    assert mock_bytesio.return_value.truncate.call_count == 2
+    assert mock_bytesio.return_value.seek.call_count == 4
+
+
+@patch("moko_server.camera.PiCamera")
+def test_picamera_record(mock_picamera):
+    """
+    Test the record property of RaspberryPi camera class.
     """
     camera = RaspberryPiCamera()
     camera.record()
     mock_picamera.return_value.start_recording.assert_called_once()
+
+
+class MockStrftime(Mock):
+    def __init__(self):
+        pass
+
+    def strftime(self, format="%Y%m%d%G%M%S"):
+        return "20220101000000"
+
+
+class MockDate(Mock):
+    def __init__(self, name="name"):
+        pass
+
+    def now(self):
+        return MockStrftime()
+
+
+@pytest.mark.parametrize(
+    "path, expected",
+    [
+        ("path", "path/" + MockDate().now().strftime() + ".jpg"),
+        ("path/", "path/" + MockDate().now().strftime() + ".jpg"),
+    ],
+)
+@patch("moko_server.camera.datetime", new_callable=MockDate)
+@patch("moko_server.camera.Image.open")
+def test_picamera_save_frame(mock_open, mock_time, path, expected):
+    """
+    Test the record property of RaspberryPi camera class.
+    """
+    camera = RaspberryPiCamera()
+    camera.save_frame(path)
+    mock_open.assert_called_once()
+    mock_open.return_value.save.assert_called_once()
+    mock_open.return_value.save.assert_called_with(expected)
